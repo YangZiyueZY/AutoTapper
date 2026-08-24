@@ -12,6 +12,9 @@ jobs:
   build:
     name: Build APK
     runs-on: ubuntu-latest
+    env:
+      # CI 上直接使用官方仓库，跳过阿里云镜像（镜像偶发 502 会导致构建失败）
+      SKIP_ALIYUN: "true"
 
     steps:
       - name: Checkout code
