@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_page"
+    android:background="?android:attr/colorBackground"
     android:fillViewport="true">
 
     <LinearLayout
@@ -14,25 +14,23 @@
 
         <!-- 头部 -->
         <com.google.android.material.card.MaterialCardView
+            style="@style/Card.AutoTapper.Header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/primary"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp">
+            app:cardBackgroundColor="?attr/colorPrimary"
+            app:cardCornerRadius="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/screen_title"
-                    android:textColor="@color/on_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="@style/Text.AutoTapper.Headline"
+                    android:textColor="?attr/colorOnPrimary" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -40,8 +38,8 @@
                     android:layout_marginTop="6dp"
                     android:lineSpacingExtra="3dp"
                     android:text="@string/screen_subtitle"
-                    android:textColor="#D8F2EE"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/Text.AutoTapper.Body"
+                    android:textColor="?attr/colorOnPrimary" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -55,29 +53,27 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textColor="@color/on_primary"
-                        android:textSize="13sp" />
+                        android:textAppearance="@style/Text.AutoTapper.Caption"
+                        android:textColor="?attr/colorOnPrimary" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_check_update"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:minHeight="36dp"
                         android:text="@string/check_update"
-                        android:textColor="@color/on_primary" />
+                        android:textColor="?attr/colorOnPrimary" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <!-- 权限状态 -->
         <com.google.android.material.card.MaterialCardView
+            style="@style/Card.AutoTapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            app:cardBackgroundColor="@color/card_bg"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="1dp">
+            android:layout_marginTop="14dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -89,9 +85,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/status_title"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="@style/Text.AutoTapper.Title" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -111,16 +105,15 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/Text.AutoTapper.Body" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_grant_overlay"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/grant_permission_button"
-                        android:textColor="@color/primary" />
+                        android:textColor="?attr/colorPrimary" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -141,28 +134,25 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/Text.AutoTapper.Body" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_grant_accessibility"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/grant_permission_button"
-                        android:textColor="@color/primary" />
+                        android:textColor="?attr/colorPrimary" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <!-- 点击点位 -->
         <com.google.android.material.card.MaterialCardView
+            style="@style/Card.AutoTapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            app:cardBackgroundColor="@color/card_bg"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="1dp">
+            android:layout_marginTop="14dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -181,9 +171,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/points_title"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textAppearance="@style/Text.AutoTapper.Title" />
 
                     <TextView
                         android:id="@+id/tv_points_count"
@@ -194,8 +182,8 @@
                         android:paddingEnd="10dp"
                         android:paddingTop="3dp"
                         android:paddingBottom="3dp"
-                        android:textColor="@color/primary_dark"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/Text.AutoTapper.Caption"
+                        android:textColor="?attr/colorOnPrimaryContainer"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -205,8 +193,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:text="@string/points_empty"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp"
+                    android:textAppearance="@style/Text.AutoTapper.Body"
                     android:visibility="gone" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -219,23 +206,21 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_open_controller"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:text="@string/open_controller"
-                    android:textColor="@color/primary_dark" />
+                    android:textColor="?attr/colorPrimary" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <!-- 点击配置 -->
         <com.google.android.material.card.MaterialCardView
+            style="@style/Card.AutoTapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            app:cardBackgroundColor="@color/card_bg"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="1dp">
+            android:layout_marginTop="14dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -247,9 +232,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/config_title"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="@style/Text.AutoTapper.Title" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -257,11 +240,10 @@
                     android:layout_marginTop="6dp"
                     android:lineSpacingExtra="3dp"
                     android:text="@string/config_intro"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:textAppearance="@style/Text.AutoTapper.Body" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Input.AutoTapper.Outlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
@@ -280,11 +262,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/interval_help"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/Text.AutoTapper.Caption" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Input.AutoTapper.Outlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -303,11 +284,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/random_extra_help"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/Text.AutoTapper.Caption" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Input.AutoTapper.Outlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -326,17 +306,48 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/repeat_count_help"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/Text.AutoTapper.Caption" />
+
+                <!-- 悬浮窗透明度设置 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/controller_alpha_label"
+                    android:textAppearance="@style/Text.AutoTapper.Title" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_controller_alpha"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:stepSize="0.05"
+                        android:valueFrom="0.3"
+                        android:valueTo="1.0"
+                        app:trackHeight="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_controller_alpha_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:minWidth="42dp"
+                        android:textAppearance="@style/Text.AutoTapper.Body"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="@string/config_summary_title"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="@style/Text.AutoTapper.Label" />
 
                 <TextView
                     android:id="@+id/tv_config_summary"
@@ -346,40 +357,18 @@
                     android:background="@drawable/bg_summary"
                     android:lineSpacingExtra="4dp"
                     android:padding="14dp"
-                    android:textColor="#1F3A5F"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/Text.AutoTapper.Body"
+                    android:textColor="?attr/colorOnSecondaryContainer" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 操作按钮 -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_start"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/start_clicking"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_stop"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/stop_clicking"
-            android:textColor="@color/accent_dark"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
         <!-- 使用说明 -->
         <com.google.android.material.card.MaterialCardView
+            style="@style/Card.AutoTapper.Filled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            app:cardBackgroundColor="#EAF3F1"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
+            android:layout_marginBottom="16dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -387,8 +376,7 @@
                 android:lineSpacingExtra="4dp"
                 android:padding="14dp"
                 android:text="@string/usage_note"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
+                android:textAppearance="@style/Text.AutoTapper.Body" />
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </ScrollView>

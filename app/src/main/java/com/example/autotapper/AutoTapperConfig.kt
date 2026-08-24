@@ -11,6 +11,7 @@ object AutoTapperConfig {
     const val KEY_INTERVAL_MS = "interval_ms"
     const val KEY_RANDOM_EXTRA_MS = "random_extra_ms"
     const val KEY_REPEAT_COUNT = "repeat_count"
+    const val KEY_CONTROLLER_ALPHA = "controller_alpha"
 
     // 更新检查：用户主动忽略的版本、最近一次已提醒过的版本
     const val KEY_UPDATE_IGNORED_VERSION = "update_ignored_version"
@@ -27,6 +28,7 @@ object AutoTapperConfig {
     const val ACTION_START_PICKING = "com.example.autotapper.action.START_PICKING"
     const val ACTION_STOP_CONTROLLER = "com.example.autotapper.action.STOP_CONTROLLER"
     const val ACTION_CLICK_STATE_CHANGED = "com.example.autotapper.action.CLICK_STATE_CHANGED"
+    const val ACTION_CONTROLLER_ALPHA_CHANGED = "com.example.autotapper.action.CONTROLLER_ALPHA_CHANGED"
 
     const val EXTRA_TAP_X = "extra_tap_x"
     const val EXTRA_TAP_Y = "extra_tap_y"
@@ -84,6 +86,14 @@ object AutoTapperConfig {
     }
 
     fun hasPoints(context: Context): Boolean = loadPoints(context).isNotEmpty()
+
+    fun saveControllerAlpha(context: Context, alpha: Float) {
+        prefs(context).edit().putFloat(KEY_CONTROLLER_ALPHA, alpha.coerceIn(0.3f, 1f)).apply()
+    }
+
+    fun getControllerAlpha(context: Context): Float {
+        return prefs(context).getFloat(KEY_CONTROLLER_ALPHA, 0.9f).coerceIn(0.3f, 1f)
+    }
 
     private fun toJson(points: List<TapPoint>): String =
         JSONArray().apply {

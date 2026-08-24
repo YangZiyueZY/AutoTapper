@@ -18,6 +18,15 @@ class PointListAdapter(
         notifyDataSetChanged()
     }
 
+    fun removeItem(index: Int) {
+        if (index !in items.indices) {
+            return
+        }
+        items = items.toMutableList().apply { removeAt(index) }
+        notifyItemRemoved(index)
+        notifyItemRangeChanged(index, items.size - index)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PointViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_point, parent, false)

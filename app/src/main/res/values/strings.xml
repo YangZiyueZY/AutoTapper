@@ -28,6 +28,8 @@
     <string name="random_extra_help">单位毫秒，每次在基础间隔上额外随机增加 0 到该数值之间的延迟。填 0 表示固定节奏。</string>
     <string name="repeat_count_label">点击轮数</string>
     <string name="repeat_count_help">每轮按顺序把每个点位各点一次。填 1 = 每个点位各点 1 次；填 10 = 完整跑 10 轮；填 0 = 一直点击直到手动停止。</string>
+    <string name="controller_alpha_label">悬浮窗透明度</string>
+    <string name="controller_alpha_value">%1$.0f%%</string>
     <string name="config_summary_title">当前配置摘要</string>
     <string name="config_summary_template">多点轮询 · %1$d 个点位\n每次点击后等待：%2$d-%3$d 毫秒\n点击轮数：%4$s</string>
     <string name="config_summary_repeat_infinite">无限（直到手动停止）</string>
@@ -98,10 +100,11 @@
     <string name="overlay_handle_idle">AT</string>
     <string name="overlay_handle_running">RUN</string>
     <string name="overlay_points_template">%1$d 个：%2$s</string>
+    <string name="overlay_points_more">等 %1$d 个</string>
     <string name="overlay_point_missing">未设置点位</string>
     <string name="overlay_repeat_infinite">无限</string>
     <string name="overlay_repeat_finite">%1$d 轮</string>
     <string name="overlay_state_running">运行中</string>
     <string name="overlay_state_idle">待命</string>
-    <string name="overlay_status_template">状态：%1$s\n点位（%2$s）\n间隔：%3$d-%4$d ms\n轮数：%5$s</string>
+    <string name="overlay_status_template">状态：%1$s · 间隔 %2$d-%3$d ms · 轮数：%4$s</string>
 </resources>
