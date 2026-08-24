@@ -12,7 +12,7 @@
         android:icon="@drawable/ic_autotapper"
         android:roundIcon="@drawable/ic_autotapper"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        android:theme="@style/Theme.AutoTapper">
 
         <activity
             android:name="com.example.autotapper.MainActivity"
