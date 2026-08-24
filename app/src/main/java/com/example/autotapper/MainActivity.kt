@@ -6,12 +6,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
@@ -28,11 +30,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvPointsEmpty: TextView
     private lateinit var tvPointsCount: TextView
     private lateinit var tvConfigSummary: TextView
+    private lateinit var tvVersion: TextView
     private lateinit var etIntervalMs: EditText
     private lateinit var etRandomExtraMs: EditText
     private lateinit var etRepeatCount: EditText
 
     private var pointReceiverRegistered = false
+    private var isCheckingUpdate = false
     private var points: List<TapPoint> = emptyList()
     private lateinit var pointsAdapter: PointListAdapter
 
@@ -57,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         tvPointsEmpty = findViewById(R.id.tv_points_empty)
         tvPointsCount = findViewById(R.id.tv_points_count)
         tvConfigSummary = findViewById(R.id.tv_config_summary)
+        tvVersion = findViewById(R.id.tv_version)
         etIntervalMs = findViewById(R.id.et_interval_ms)
         etRandomExtraMs = findViewById(R.id.et_random_extra_ms)
         etRepeatCount = findViewById(R.id.et_repeat_count)
@@ -80,6 +85,11 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btn_stop).setOnClickListener {
             stopAutoTap()
         }
+        findViewById<View>(R.id.btn_check_update).setOnClickListener {
+            startUpdateCheck(silent = false)
+        }
+
+        tvVersion.text = getString(R.string.version_label, BuildConfig.VERSION_NAME)
 
         etIntervalMs.doAfterTextChanged { updateConfigSummary() }
         etRandomExtraMs.doAfterTextChanged { updateConfigSummary() }
@@ -87,6 +97,7 @@ class MainActivity : AppCompatActivity() {
 
         loadSavedConfig()
         updateStatus()
+        startUpdateCheck(silent = true)
     }
 
     override fun onStart() {
@@ -216,6 +227,104 @@ class MainActivity : AppCompatActivity() {
     private fun stopAutoTap() {
         sendBroadcast(Intent(AutoTapperConfig.ACTION_STOP_CLICKING).setPackage(packageName))
         Toast.makeText(this, R.string.stop_command_sent, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startUpdateCheck(silent: Boolean) {
+        if (isCheckingUpdate) {
+            return
+        }
+        isCheckingUpdate = true
+        if (!silent) {
+            Toast.makeText(this, R.string.update_checking, Toast.LENGTH_SHORT).show()
+        }
+        UpdateChecker.checkForUpdate { info ->
+            runOnUiThread {
+                isCheckingUpdate = false
+                handleUpdateResult(info, silent)
+            }
+        }
+    }
+
+    private fun handleUpdateResult(info: UpdateChecker.UpdateInfo?, silent: Boolean) {
+        if (info == null) {
+            if (!silent) {
+                Toast.makeText(this, R.string.update_check_failed, Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
+        if (!UpdateChecker.isNewer(info.latestVersion, BuildConfig.VERSION_NAME)) {
+            if (!silent) {
+                Toast.makeText(this, R.string.update_latest, Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
+        val prefs = AutoTapperConfig.prefs(this)
+        if (prefs.getString(AutoTapperConfig.KEY_UPDATE_IGNORED_VERSION, null) ==
+            info.latestVersion
+        ) {
+            return
+        }
+
+        val alreadyNotified = prefs.getString(AutoTapperConfig.KEY_UPDATE_NOTIFIED_VERSION, null) ==
+            info.latestVersion
+        if (silent && alreadyNotified) {
+            return
+        }
+
+        prefs.edit().putString(AutoTapperConfig.KEY_UPDATE_NOTIFIED_VERSION, info.latestVersion)
+            .apply()
+        UpdateNotifier.notify(this, info)
+        if (!isFinishing && !isDestroyed) {
+            showUpdateDialog(info)
+        }
+    }
+
+    private fun showUpdateDialog(info: UpdateChecker.UpdateInfo) {
+        val message = buildString {
+            append(
+                getString(
+                    R.string.update_dialog_message,
+                    BuildConfig.VERSION_NAME,
+                    info.latestVersion
+                )
+            )
+            val notes = info.notes?.lineSequence()
+                ?.filter { it.isNotBlank() }
+                ?.joinToString("\n")
+                ?.take(400)
+            if (!notes.isNullOrBlank()) {
+                append("\n\n").append(getString(R.string.update_dialog_notes_title))
+                    .append("\n").append(notes)
+            }
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.update_dialog_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.update_download) { _, _ ->
+                openUrl(info.downloadUrl)
+            }
+            .setNeutralButton(R.string.update_ignore) { _, _ ->
+                AutoTapperConfig.prefs(this).edit()
+                    .putString(AutoTapperConfig.KEY_UPDATE_IGNORED_VERSION, info.latestVersion)
+                    .apply()
+            }
+            .setNegativeButton(R.string.update_later, null)
+            .show()
+    }
+
+    private fun openUrl(url: String) {
+        if (!UpdateChecker.isSafeServerUrl(url)) {
+            Toast.makeText(this, R.string.update_open_failed, Toast.LENGTH_SHORT).show()
+            return
+        }
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (_: Exception) {
+            Toast.makeText(this, R.string.update_open_failed, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun updateConfigSummary() {

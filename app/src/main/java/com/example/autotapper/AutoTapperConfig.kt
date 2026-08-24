@@ -12,6 +12,10 @@ object AutoTapperConfig {
     const val KEY_RANDOM_EXTRA_MS = "random_extra_ms"
     const val KEY_REPEAT_COUNT = "repeat_count"
 
+    // 更新检查：用户主动忽略的版本、最近一次已提醒过的版本
+    const val KEY_UPDATE_IGNORED_VERSION = "update_ignored_version"
+    const val KEY_UPDATE_NOTIFIED_VERSION = "update_notified_version"
+
     // 旧版单点字段，仅用于一次性迁移
     const val KEY_TAP_X = "tap_x"
     const val KEY_TAP_Y = "tap_y"
