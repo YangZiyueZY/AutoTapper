@@ -14,10 +14,14 @@ import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.os.IBinder
 import android.text.TextUtils
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -46,7 +50,7 @@ class OverlayService : Service() {
     private var clearButtonView: ImageView? = null
     private var pickerView: View? = null
     private var pickerCounterView: TextView? = null
-    private val pointMarkers: MutableList<View> = mutableListOf()
+    private val pointMarkers: MutableList<TextView> = mutableListOf()
     private val markerAnimators: MutableMap<View, ObjectAnimator> = mutableMapOf()
 
     private var isControllerExpanded = false
@@ -708,10 +712,10 @@ class OverlayService : Service() {
     }
 
     private fun buildControllerStatusText(): String {
-        val prefs = AutoTapperConfig.prefs(this)
-        val intervalMs = prefs.getLong(AutoTapperConfig.KEY_INTERVAL_MS, 400L).coerceAtLeast(100L)
-        val randomExtraMs = prefs.getLong(AutoTapperConfig.KEY_RANDOM_EXTRA_MS, 80L).coerceAtLeast(0L)
-        val repeatCount = prefs.getInt(AutoTapperConfig.KEY_REPEAT_COUNT, 0).coerceAtLeast(0)
+        val intervalMs = AutoTapperConfig.getIntervalMs(this)
+        val randomExtraMs = AutoTapperConfig.getRandomExtraMs(this)
+        val repeatCount = AutoTapperConfig.getRepeatCount(this)
+        val tapDurationMs = AutoTapperConfig.getTapDurationMs(this)
 
         val repeatText = if (repeatCount == 0) {
             getString(R.string.overlay_repeat_infinite)
@@ -726,6 +730,7 @@ class OverlayService : Service() {
             stateText,
             intervalMs,
             intervalMs + randomExtraMs,
+            tapDurationMs,
             repeatText
         )
     }
@@ -752,14 +757,7 @@ class OverlayService : Service() {
         }
 
         while (pointMarkers.size < points.size) {
-            val marker = View(this).apply {
-                background = roundedDrawable(
-                    fillColor = applyAlpha(color(R.color.accent), 0x66),
-                    strokeColor = applyAlpha(color(R.color.accent), 0xCC),
-                    radiusDp = 20f,
-                    shape = GradientDrawable.OVAL
-                )
-            }
+            val marker = createPointMarker()
             windowManager.addView(marker, markerLayoutParams(0, 0))
             pointMarkers.add(marker)
         }
@@ -771,8 +769,19 @@ class OverlayService : Service() {
 
         points.forEachIndexed { index, point ->
             val marker = pointMarkers[index]
+            val label = (index + 1).toString()
+            marker.text = label
+            marker.setTextSize(TypedValue.COMPLEX_UNIT_SP, markerTextSizeSp(label))
             windowManager.updateViewLayout(marker, markerLayoutParams(point.x, point.y))
-            if (isClicking && index == currentPointIndex) {
+
+            val active = isClicking && index == currentPointIndex
+            val wasActive = marker.tag as? Boolean ?: false
+            if (wasActive != active) {
+                marker.tag = active
+                marker.background = markerBackground(active)
+            }
+
+            if (active) {
                 marker.alpha = 1f
                 startMarkerPulse(marker)
             } else {
@@ -781,6 +790,42 @@ class OverlayService : Service() {
                 marker.scaleX = 1f
                 marker.scaleY = 1f
             }
+        }
+    }
+
+    /** 圆形序号徽标，序号与主界面点位列表一致；点击中的点位会高亮并脉冲。 */
+    private fun createPointMarker() = TextView(this).apply {
+        gravity = Gravity.CENTER
+        includeFontPadding = false
+        isSingleLine = true
+        setTextColor(color(R.color.on_primary))
+        setTypeface(typeface, Typeface.BOLD)
+        background = markerBackground(active = false)
+    }
+
+    private fun markerTextSizeSp(label: String): Float = when {
+        label.length >= 3 -> 10f
+        label.length == 2 -> 12.5f
+        else -> 15f
+    }
+
+    /**
+     * 外层半透明光晕 + 内层实心圆 + 白色描边，保证序号在任意应用背景上都清晰可读。
+     * 悬浮窗不支持窗口外阴影，所以用光晕代替 elevation。
+     */
+    private fun markerBackground(active: Boolean): Drawable {
+        val halo = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(applyAlpha(color(R.color.accent), if (active) 0x5C else 0x2E))
+        }
+        val badge = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(if (active) color(R.color.accent) else color(R.color.accent_dark))
+            setStroke(dp(2), color(R.color.on_primary))
+        }
+        val inset = dp(MARKER_INSET_DP)
+        return LayerDrawable(arrayOf(halo, badge)).apply {
+            setLayerInset(1, inset, inset, inset, inset)
         }
     }
 
@@ -830,7 +875,7 @@ class OverlayService : Service() {
         }
 
     private fun markerLayoutParams(x: Int, y: Int): WindowManager.LayoutParams {
-        val size = dp(40)
+        val size = dp(MARKER_SIZE_DP)
         return WindowManager.LayoutParams(
             size,
             size,
@@ -843,6 +888,8 @@ class OverlayService : Service() {
             gravity = Gravity.TOP or Gravity.START
             this.x = x - size / 2
             this.y = y - size / 2
+            // 系统会把不可触摸悬浮窗的 alpha 压到 0.8，显式写出来避免每次刷新都触发告警
+            alpha = MARKER_WINDOW_ALPHA
         }
     }
 
@@ -913,5 +960,10 @@ class OverlayService : Service() {
         private const val NOTIFICATION_CHANNEL_ID = "autotapper_overlay_controller"
         private const val NOTIFICATION_ID = 1001
         private const val ANIMATION_DURATION = 250L
+
+        // 点位序号徽标尺寸
+        private const val MARKER_SIZE_DP = 40
+        private const val MARKER_INSET_DP = 3
+        private const val MARKER_WINDOW_ALPHA = 0.8f
     }
 }

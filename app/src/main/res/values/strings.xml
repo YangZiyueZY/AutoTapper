@@ -21,21 +21,24 @@
     <string name="point_deleted_toast">已删除点位 %1$d。</string>
 
     <string name="config_title">点击配置</string>
-    <string name="config_intro">多点模式会按点位顺序轮流点击。实际等待时间 = 基础间隔 + 0 到随机附加延迟之间的随机值。</string>
+    <string name="config_intro">多点模式会按点位顺序轮流点击。实际等待时间 = 基础间隔 + 0 到随机附加延迟之间的随机值；点击时长决定每次按下到抬起持续多久。</string>
     <string name="interval_label">基础间隔</string>
-    <string name="interval_help">单位毫秒，表示每次点击之间至少等待多久。建议先从 300 到 800 之间尝试。</string>
+    <string name="interval_help">单位毫秒，表示每次点击之间至少等待多久。默认 100，建议在 100 到 300 之间尝试。</string>
     <string name="random_extra_label">随机附加延迟</string>
     <string name="random_extra_help">单位毫秒，每次在基础间隔上额外随机增加 0 到该数值之间的延迟。填 0 表示固定节奏。</string>
+    <string name="tap_duration_label">点击时长</string>
+    <string name="tap_duration_help">单位毫秒，每次按下到抬起持续的时间。默认 50，取值 10 到 2000；太短可能被部分应用忽略。</string>
     <string name="repeat_count_label">点击轮数</string>
     <string name="repeat_count_help">每轮按顺序把每个点位各点一次。填 1 = 每个点位各点 1 次；填 10 = 完整跑 10 轮；填 0 = 一直点击直到手动停止。</string>
     <string name="controller_alpha_label">悬浮窗透明度</string>
     <string name="controller_alpha_value">%1$.0f%%</string>
     <string name="config_summary_title">当前配置摘要</string>
-    <string name="config_summary_template">多点轮询 · %1$d 个点位\n每次点击后等待：%2$d-%3$d 毫秒\n点击轮数：%4$s</string>
+    <string name="config_summary_template">多点轮询 · %1$d 个点位\n每次点击后等待：%2$d-%3$d 毫秒\n单次点击时长：%4$d 毫秒\n点击轮数：%5$s</string>
     <string name="config_summary_repeat_infinite">无限（直到手动停止）</string>
     <string name="config_summary_repeat_finite">%1$d 轮</string>
-    <string name="config_summary_invalid">请输入有效配置：基础间隔至少为 100 毫秒，随机附加延迟和轮数不能留空。</string>
+    <string name="config_summary_invalid">请输入有效配置：基础间隔至少为 100 毫秒，点击时长需在 10 到 2000 毫秒之间，各字段都不能留空。</string>
     <string name="interval_adjusted_note">你输入的基础间隔低于 100 毫秒，开始时会自动按 100 毫秒处理。</string>
+    <string name="tap_duration_adjusted_note">你输入的点击时长超出 10 到 2000 毫秒的范围，开始时会自动按最近的边界值处理。</string>
 
     <string name="start_clicking">开始点击</string>
     <string name="stop_clicking">停止点击</string>
@@ -47,7 +50,7 @@
     <string name="overlay_closed">悬浮控制器已关闭。</string>
     <string name="accessibility_permission_required">需要先开启 AutoTapper 无障碍服务。</string>
     <string name="point_required">请先通过悬浮控制器上的 + 添加点击位置。</string>
-    <string name="invalid_number_input">请输入有效配置：基础间隔至少为 100 毫秒，随机附加延迟和轮数不能留空。</string>
+    <string name="invalid_number_input">请输入有效配置：基础间隔至少为 100 毫秒，点击时长需在 10 到 2000 毫秒之间，各字段都不能留空。</string>
     <string name="start_command_sent">开始指令已发送。</string>
     <string name="stop_command_sent">停止指令已发送。</string>
 
@@ -106,5 +109,5 @@
     <string name="overlay_repeat_finite">%1$d 轮</string>
     <string name="overlay_state_running">运行中</string>
     <string name="overlay_state_idle">待命</string>
-    <string name="overlay_status_template">状态：%1$s · 间隔 %2$d-%3$d ms · 轮数：%4$s</string>
+    <string name="overlay_status_template">状态：%1$s · 间隔 %2$d-%3$d ms · 时长 %4$d ms · 轮数：%5$s</string>
 </resources>

@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var etIntervalMs: EditText
     private lateinit var etRandomExtraMs: EditText
     private lateinit var etRepeatCount: EditText
+    private lateinit var etTapDurationMs: EditText
     private lateinit var sliderControllerAlpha: Slider
     private lateinit var tvControllerAlphaValue: TextView
 
@@ -69,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         etIntervalMs = findViewById(R.id.et_interval_ms)
         etRandomExtraMs = findViewById(R.id.et_random_extra_ms)
         etRepeatCount = findViewById(R.id.et_repeat_count)
+        etTapDurationMs = findViewById(R.id.et_tap_duration_ms)
         sliderControllerAlpha = findViewById(R.id.slider_controller_alpha)
         tvControllerAlphaValue = findViewById(R.id.tv_controller_alpha_value)
 
@@ -102,9 +104,31 @@ class MainActivity : AppCompatActivity() {
 
         tvVersion.text = getString(R.string.version_label, BuildConfig.VERSION_NAME)
 
-        etIntervalMs.doAfterTextChanged { updateConfigSummary() }
-        etRandomExtraMs.doAfterTextChanged { updateConfigSummary() }
-        etRepeatCount.doAfterTextChanged { updateConfigSummary() }
+        // 主界面没有单独的“保存”按钮，输入合法即落盘，点击开始时由服务读取
+        etIntervalMs.doAfterTextChanged {
+            it?.toString()?.toLongOrNull()?.let { value ->
+                AutoTapperConfig.saveIntervalMs(this, value)
+            }
+            updateConfigSummary()
+        }
+        etRandomExtraMs.doAfterTextChanged {
+            it?.toString()?.toLongOrNull()?.let { value ->
+                AutoTapperConfig.saveRandomExtraMs(this, value)
+            }
+            updateConfigSummary()
+        }
+        etRepeatCount.doAfterTextChanged {
+            it?.toString()?.toIntOrNull()?.let { value ->
+                AutoTapperConfig.saveRepeatCount(this, value)
+            }
+            updateConfigSummary()
+        }
+        etTapDurationMs.doAfterTextChanged {
+            it?.toString()?.toLongOrNull()?.let { value ->
+                AutoTapperConfig.saveTapDurationMs(this, value)
+            }
+            updateConfigSummary()
+        }
 
         loadSavedConfig()
         updateStatus()
@@ -127,12 +151,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadSavedConfig() {
-        val prefs = AutoTapperConfig.prefs(this)
-        etIntervalMs.setText(prefs.getLong(AutoTapperConfig.KEY_INTERVAL_MS, 400L).toString())
-        etRandomExtraMs.setText(
-            prefs.getLong(AutoTapperConfig.KEY_RANDOM_EXTRA_MS, 80L).toString()
-        )
-        etRepeatCount.setText(prefs.getInt(AutoTapperConfig.KEY_REPEAT_COUNT, 0).toString())
+        etIntervalMs.setText(AutoTapperConfig.getIntervalMs(this).toString())
+        etRandomExtraMs.setText(AutoTapperConfig.getRandomExtraMs(this).toString())
+        etRepeatCount.setText(AutoTapperConfig.getRepeatCount(this).toString())
+        etTapDurationMs.setText(AutoTapperConfig.getTapDurationMs(this).toString())
 
         val alpha = AutoTapperConfig.getControllerAlpha(this)
         sliderControllerAlpha.value = alpha
@@ -320,15 +342,22 @@ class MainActivity : AppCompatActivity() {
         val intervalInput = etIntervalMs.text.toString().toLongOrNull()
         val randomExtraInput = etRandomExtraMs.text.toString().toLongOrNull()
         val repeatCountInput = etRepeatCount.text.toString().toIntOrNull()
+        val tapDurationInput = etTapDurationMs.text.toString().toLongOrNull()
 
-        if (intervalInput == null || randomExtraInput == null || repeatCountInput == null) {
+        if (intervalInput == null || randomExtraInput == null ||
+            repeatCountInput == null || tapDurationInput == null
+        ) {
             tvConfigSummary.text = getString(R.string.config_summary_invalid)
             return
         }
 
-        val intervalMs = intervalInput.coerceAtLeast(100L)
+        val intervalMs = intervalInput.coerceAtLeast(AutoTapperConfig.MIN_INTERVAL_MS)
         val randomExtraMs = randomExtraInput.coerceAtLeast(0L)
         val repeatCount = repeatCountInput.coerceAtLeast(0)
+        val tapDurationMs = tapDurationInput.coerceIn(
+            AutoTapperConfig.MIN_TAP_DURATION_MS,
+            AutoTapperConfig.MAX_TAP_DURATION_MS
+        )
 
         val repeatSummary = if (repeatCount == 0) {
             getString(R.string.config_summary_repeat_infinite)
@@ -341,13 +370,25 @@ class MainActivity : AppCompatActivity() {
             points.size,
             intervalMs,
             intervalMs + randomExtraMs,
+            tapDurationMs,
             repeatSummary
         )
 
-        tvConfigSummary.text = if (intervalInput < 100L) {
-            "$summaryText\n${getString(R.string.interval_adjusted_note)}"
-        } else {
+        val notes = buildList {
+            if (intervalInput < AutoTapperConfig.MIN_INTERVAL_MS) {
+                add(getString(R.string.interval_adjusted_note))
+            }
+            if (tapDurationInput < AutoTapperConfig.MIN_TAP_DURATION_MS ||
+                tapDurationInput > AutoTapperConfig.MAX_TAP_DURATION_MS
+            ) {
+                add(getString(R.string.tap_duration_adjusted_note))
+            }
+        }
+
+        tvConfigSummary.text = if (notes.isEmpty()) {
             summaryText
+        } else {
+            summaryText + "\n" + notes.joinToString("\n")
         }
     }
 

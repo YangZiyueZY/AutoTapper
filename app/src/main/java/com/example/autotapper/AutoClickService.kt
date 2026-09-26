@@ -23,9 +23,10 @@ class AutoClickService : AccessibilityService() {
     private var pointIndex = 0
 
     private var points: List<TapPoint> = emptyList()
-    private var intervalMs = 400L
-    private var randomExtraMs = 80L
-    private var repeatCount = 0
+    private var intervalMs = AutoTapperConfig.DEFAULT_INTERVAL_MS
+    private var randomExtraMs = AutoTapperConfig.DEFAULT_RANDOM_EXTRA_MS
+    private var repeatCount = AutoTapperConfig.DEFAULT_REPEAT_COUNT
+    private var tapDurationMs = AutoTapperConfig.DEFAULT_TAP_DURATION_MS
 
     private val controlReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -82,7 +83,7 @@ class AutoClickService : AccessibilityService() {
                 GestureDescription.StrokeDescription(
                     Path().apply { moveTo(point.x.toFloat(), point.y.toFloat()) },
                     0,
-                    40
+                    tapDurationMs
                 )
             )
             .build()
@@ -125,12 +126,10 @@ class AutoClickService : AccessibilityService() {
 
     private fun startClicking() {
         points = AutoTapperConfig.loadPoints(this)
-        intervalMs = AutoTapperConfig.prefs(this)
-            .getLong(AutoTapperConfig.KEY_INTERVAL_MS, 400L).coerceAtLeast(100L)
-        randomExtraMs = AutoTapperConfig.prefs(this)
-            .getLong(AutoTapperConfig.KEY_RANDOM_EXTRA_MS, 80L).coerceAtLeast(0L)
-        repeatCount = AutoTapperConfig.prefs(this)
-            .getInt(AutoTapperConfig.KEY_REPEAT_COUNT, 0).coerceAtLeast(0)
+        intervalMs = AutoTapperConfig.getIntervalMs(this)
+        randomExtraMs = AutoTapperConfig.getRandomExtraMs(this)
+        repeatCount = AutoTapperConfig.getRepeatCount(this)
+        tapDurationMs = AutoTapperConfig.getTapDurationMs(this)
 
         if (points.isEmpty()) {
             Toast.makeText(this, R.string.point_required, Toast.LENGTH_SHORT).show()

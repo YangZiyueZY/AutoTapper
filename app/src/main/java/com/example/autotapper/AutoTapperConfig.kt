@@ -11,7 +11,18 @@ object AutoTapperConfig {
     const val KEY_INTERVAL_MS = "interval_ms"
     const val KEY_RANDOM_EXTRA_MS = "random_extra_ms"
     const val KEY_REPEAT_COUNT = "repeat_count"
+    const val KEY_TAP_DURATION_MS = "tap_duration_ms"
     const val KEY_CONTROLLER_ALPHA = "controller_alpha"
+
+    // 点击配置的默认值与取值范围
+    const val DEFAULT_INTERVAL_MS = 100L
+    const val DEFAULT_RANDOM_EXTRA_MS = 80L
+    const val DEFAULT_REPEAT_COUNT = 0
+    const val DEFAULT_TAP_DURATION_MS = 50L
+
+    const val MIN_INTERVAL_MS = 100L
+    const val MIN_TAP_DURATION_MS = 10L
+    const val MAX_TAP_DURATION_MS = 2_000L
 
     // 更新检查：用户主动忽略的版本、最近一次已提醒过的版本
     const val KEY_UPDATE_IGNORED_VERSION = "update_ignored_version"
@@ -86,6 +97,37 @@ object AutoTapperConfig {
     }
 
     fun hasPoints(context: Context): Boolean = loadPoints(context).isNotEmpty()
+
+    fun getIntervalMs(context: Context): Long =
+        prefs(context).getLong(KEY_INTERVAL_MS, DEFAULT_INTERVAL_MS).coerceAtLeast(MIN_INTERVAL_MS)
+
+    fun saveIntervalMs(context: Context, value: Long) {
+        prefs(context).edit().putLong(KEY_INTERVAL_MS, value.coerceAtLeast(MIN_INTERVAL_MS)).apply()
+    }
+
+    fun getRandomExtraMs(context: Context): Long =
+        prefs(context).getLong(KEY_RANDOM_EXTRA_MS, DEFAULT_RANDOM_EXTRA_MS).coerceAtLeast(0L)
+
+    fun saveRandomExtraMs(context: Context, value: Long) {
+        prefs(context).edit().putLong(KEY_RANDOM_EXTRA_MS, value.coerceAtLeast(0L)).apply()
+    }
+
+    fun getRepeatCount(context: Context): Int =
+        prefs(context).getInt(KEY_REPEAT_COUNT, DEFAULT_REPEAT_COUNT).coerceAtLeast(0)
+
+    fun saveRepeatCount(context: Context, value: Int) {
+        prefs(context).edit().putInt(KEY_REPEAT_COUNT, value.coerceAtLeast(0)).apply()
+    }
+
+    fun getTapDurationMs(context: Context): Long =
+        prefs(context).getLong(KEY_TAP_DURATION_MS, DEFAULT_TAP_DURATION_MS)
+            .coerceIn(MIN_TAP_DURATION_MS, MAX_TAP_DURATION_MS)
+
+    fun saveTapDurationMs(context: Context, value: Long) {
+        prefs(context).edit()
+            .putLong(KEY_TAP_DURATION_MS, value.coerceIn(MIN_TAP_DURATION_MS, MAX_TAP_DURATION_MS))
+            .apply()
+    }
 
     fun saveControllerAlpha(context: Context, alpha: Float) {
         prefs(context).edit().putFloat(KEY_CONTROLLER_ALPHA, alpha.coerceIn(0.3f, 1f)).apply()
