@@ -1,118 +1,99 @@
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="1200" height="360" viewBox="0 0 1200 360"
-     role="img" aria-labelledby="title desc">
-  <title id="title">AutoTapper</title>
-  <desc id="desc">Android 自动连点工具：在任意应用里通过悬浮控制器取点，自动按顺序轮流点击多个位置。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420"
+     role="img" aria-labelledby="heroTitle heroDesc">
+  <title id="heroTitle">AutoTapper：在任意应用里取点，按顺序轮流点击的 Android 工具</title>
+  <desc id="heroDesc">左侧是项目名与一句价值说明，下方三个带编号的点位用虚线连成轮询回环；右侧是应用内悬浮控制器的面板结构，含 ADD、DEL、GO 三个按钮与状态、间隔、点位读数。</desc>
 
   <defs>
-    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0C111B"/>
-      <stop offset="1" stop-color="#101828"/>
-    </linearGradient>
-    <radialGradient id="haloOrange" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#FF7A1A" stop-opacity="0.16"/>
-      <stop offset="1" stop-color="#FF7A1A" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="pointGlow" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#FF8A3D" stop-opacity="0.65"/>
-      <stop offset="1" stop-color="#FF8A3D" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#121A2A"/>
-      <stop offset="1" stop-color="#0B1120"/>
-    </linearGradient>
-    <linearGradient id="seqGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#FF7A1A"/>
-      <stop offset="1" stop-color="#FFB067"/>
-    </linearGradient>
-    <linearGradient id="titleGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#B9C7DA"/>
-    </linearGradient>
-    <pattern id="dotGrid" width="26" height="26" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="1.6" fill="#8FA3C0"/>
-    </pattern>
-    <clipPath id="frameClip">
-      <rect width="1200" height="360" rx="28"/>
-    </clipPath>
-    <filter id="phoneShadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="14" stdDeviation="20" flood-color="#000000" flood-opacity="0.45"/>
-    </filter>
+    <style>
+      .ui { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    </style>
   </defs>
 
-  <!-- 背景与氛围 -->
-  <g clip-path="url(#frameClip)">
-    <rect width="1200" height="360" fill="url(#bgGrad)"/>
-    <rect x="620" width="580" height="360" fill="url(#dotGrid)" opacity="0.06"/>
-    <ellipse cx="950" cy="185" rx="290" ry="210" fill="url(#haloOrange)"/>
-    <circle cx="70" cy="340" r="150" fill="url(#haloOrange)" opacity="0.5"/>
+  <!-- 底板：墨色，自带背景，浅色/深色主题下都成立 -->
+  <rect width="1200" height="420" fill="#161616" />
+
+  <!-- 顶部三色条：与 App 页面顶部同一元素 -->
+  <g>
+    <rect x="0" y="0" width="400" height="4" fill="#FF00F0" />
+    <rect x="400" y="0" width="400" height="4" fill="#FFFA00" />
+    <rect x="800" y="0" width="400" height="4" fill="#00FFA2" />
   </g>
 
-  <!-- 左侧标题区 -->
-  <g>
-    <rect x="72" y="48" width="234" height="34" rx="17" fill="#FF7A1A" fill-opacity="0.10"
-          stroke="#FF7A1A" stroke-opacity="0.5"/>
-    <text x="189" y="71" text-anchor="middle"
-          font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Microsoft YaHei, sans-serif"
-          font-size="17" letter-spacing="1" fill="#FFB067">ANDROID · 自动连点工具</text>
+  <g id="title-block">
+    <text class="mono" x="56" y="78" font-size="19" letter-spacing="3.4" fill="#A3A3A3">// AUTO TAPPER</text>
 
-    <text x="72" y="152" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif"
-          font-size="68" font-weight="800" fill="url(#titleGrad)">AutoTapper</text>
+    <text class="ui" x="56" y="156" font-size="64" font-weight="700" letter-spacing="-1" fill="#F4F4F2">AutoTapper</text>
 
-    <rect x="74" y="170" width="136" height="7" rx="3.5" fill="#FF7A1A"/>
+    <text class="ui" x="56" y="204" font-size="26" fill="#C9C9C6">在任意应用里取点，按顺序轮流点击。</text>
 
-    <text x="72" y="220" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Microsoft YaHei, sans-serif"
-          font-size="24" fill="#C6D0DE">在任意应用里轻触取点，</text>
-    <text x="72" y="252" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Microsoft YaHei, sans-serif"
-          font-size="24" fill="#C6D0DE">自动按顺序轮流点击多个位置。</text>
+    <text class="mono" x="56" y="248" font-size="19" fill="#A3A3A3">v1.3.0 │ Android 7.0+ │ 多点轮询 │ 无障碍 / Shizuku</text>
+  </g>
 
-    <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Microsoft YaHei, sans-serif"
-       font-size="17" fill="#93A4BC">
-      <rect x="72" y="276" width="104" height="32" rx="16" fill="#131B29" stroke="#263144"/>
-      <text x="124" y="297" text-anchor="middle">多点轮流</text>
-      <rect x="190" y="276" width="118" height="32" rx="16" fill="#131B29" stroke="#263144"/>
-      <text x="249" y="297" text-anchor="middle">悬浮控制器</text>
-      <rect x="322" y="276" width="132" height="32" rx="16" fill="#131B29" stroke="#263144"/>
-      <text x="388" y="297" text-anchor="middle">自动更新检查</text>
+  <!-- 轮询回环：三个编号点位 + 回到起点 -->
+  <g id="poll-loop" transform="translate(56 300)">
+    <path d="M236 52 H22" stroke="#3A3A3A" stroke-width="2" stroke-dasharray="7 8" />
+    <path d="M22 52 l14 -7 v14 z" fill="#3A3A3A" />
+
+    <g>
+      <path d="M0 0 H32 V24 L24 32 H0 Z" fill="#FFFA00" />
+      <text class="mono" x="9" y="22" font-size="17" font-weight="700" fill="#161616">1</text>
+    </g>
+    <g transform="translate(104 0)">
+      <path d="M0 0 H32 V24 L24 32 H0 Z" fill="#2E2E2E" stroke="#3A3A3A" stroke-width="1.4" />
+      <text class="mono" x="9" y="22" font-size="17" font-weight="700" fill="#EDEDED">2</text>
+    </g>
+    <g transform="translate(208 0)">
+      <path d="M0 0 H32 V24 L24 32 H0 Z" fill="#2E2E2E" stroke="#3A3A3A" stroke-width="1.4" />
+      <text class="mono" x="9" y="22" font-size="17" font-weight="700" fill="#EDEDED">3</text>
+    </g>
+
+    <text class="ui" x="286" y="24" font-size="19" fill="#A3A3A3">每个点位各点一次，算一轮</text>
+  </g>
+
+  <!-- 右侧：应用里的悬浮控制器 -->
+  <g id="controller-panel" transform="translate(648 52)">
+    <rect width="496" height="340" fill="#222222" stroke="#353535" stroke-width="1.5" />
+    <g>
+      <rect x="0.75" y="0.75" width="164.8" height="4" fill="#FF00F0" />
+      <rect x="165.55" y="0.75" width="164.8" height="4" fill="#FFFA00" />
+      <rect x="330.35" y="0.75" width="164.9" height="4" fill="#00FFA2" />
+    </g>
+
+    <g transform="translate(20 32)">
+      <path d="M0 0 H74 V22 L66 30 H0 Z" fill="#2E2E2E" stroke="#353535" stroke-width="1.4" />
+      <text class="ui" x="14" y="21" font-size="17" fill="#EDEDED">收起</text>
+    </g>
+    <text class="mono" x="112" y="55" font-size="15" letter-spacing="2.6" fill="#A3A3A3">// CONTROLLER</text>
+
+    <text class="ui" x="20" y="100" font-size="25" font-weight="700" fill="#EDEDED">悬浮控制器</text>
+
+    <g transform="translate(20 120)">
+      <g>
+        <path d="M0 0 H118 V46 L108 56 H0 Z" fill="#2E2E2E" stroke="#353535" stroke-width="1.4" />
+        <text class="mono" x="20" y="37" font-size="19" letter-spacing="2.2" fill="#EDEDED">ADD</text>
+      </g>
+      <g transform="translate(128 0)">
+        <path d="M0 0 H118 V46 L108 56 H0 Z" fill="#2E2E2E" stroke="#353535" stroke-width="1.4" />
+        <text class="mono" x="20" y="37" font-size="19" letter-spacing="2.2" fill="#EDEDED">DEL</text>
+      </g>
+      <g transform="translate(256 0)">
+        <path d="M0 0 H118 V46 L108 56 H0 Z" fill="#FFFA00" />
+        <text class="mono" x="20" y="37" font-size="19" font-weight="700" letter-spacing="2.2" fill="#161616">GO</text>
+      </g>
+    </g>
+
+    <g transform="translate(20 196)">
+      <path d="M0 0 H456" stroke="#353535" stroke-width="1.4" />
+      <text class="ui" x="0" y="29" font-size="18" fill="#A3A3A3">状态</text>
+      <text class="mono" x="456" y="29" font-size="20" text-anchor="end" fill="#EDEDED">待命</text>
+      <path d="M0 46 H456" stroke="#353535" stroke-width="1.4" />
+      <text class="ui" x="0" y="75" font-size="18" fill="#A3A3A3">间隔</text>
+      <text class="mono" x="456" y="75" font-size="20" text-anchor="end" fill="#EDEDED">100–180 ms</text>
+      <path d="M0 92 H456" stroke="#353535" stroke-width="1.4" />
+      <text class="ui" x="0" y="121" font-size="18" fill="#A3A3A3">点位</text>
+      <text class="mono" x="456" y="121" font-size="20" text-anchor="end" fill="#EDEDED">3 个</text>
+      <path d="M0 138 H456" stroke="#353535" stroke-width="1.4" />
     </g>
   </g>
-
-  <!-- 右侧手机示意 -->
-  <g filter="url(#phoneShadow)">
-    <rect x="800" y="30" width="280" height="300" rx="42" fill="#141C2B" stroke="#2A3547" stroke-width="2"/>
-  </g>
-  <circle cx="940" cy="37" r="3" fill="#232E40"/>
-  <rect x="814" y="44" width="252" height="272" rx="30" fill="url(#screenGrad)" stroke="#232E40" stroke-width="1.5"/>
-
-  <!-- 点位循环轨迹 -->
-  <path d="M 884 150 C 920 86 962 80 992 118 C 1030 160 986 236 912 242 C 852 246 850 186 884 150 Z"
-        fill="none" stroke="url(#seqGrad)" stroke-width="3" stroke-linecap="round"
-        stroke-dasharray="1 10" opacity="0.85"/>
-
-  <!-- 点位 1 -->
-  <circle cx="884" cy="150" r="13" fill="#0B1120" stroke="#FF7A1A" stroke-width="3"/>
-  <circle cx="884" cy="150" r="4.5" fill="#FF7A1A"/>
-  <text x="854" y="143" font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
-        font-size="17" fill="#8B949E">1</text>
-
-  <!-- 点位 3 -->
-  <circle cx="912" cy="242" r="13" fill="#0B1120" stroke="#FF7A1A" stroke-width="3"/>
-  <circle cx="912" cy="242" r="4.5" fill="#FF7A1A"/>
-  <text x="884" y="270" font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
-        font-size="17" fill="#8B949E">3</text>
-
-  <!-- 点位 2：当前点击点（发光高亮） -->
-  <circle cx="992" cy="118" r="30" fill="url(#pointGlow)"/>
-  <circle cx="992" cy="118" r="24" fill="none" stroke="#FF8A3D" stroke-width="2" opacity="0.4"/>
-  <circle cx="992" cy="118" r="15" fill="#0B1120" stroke="#FF8A3D" stroke-width="3.5"/>
-  <circle cx="992" cy="118" r="6.5" fill="#FF8A3D"/>
-  <text x="1022" y="124" font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
-        font-size="17" fill="#FFB067">2</text>
-
-  <!-- GO 提示条 -->
-  <rect x="868" y="272" width="144" height="34" rx="17" fill="#FF7A1A" fill-opacity="0.12"
-        stroke="#FF7A1A" stroke-opacity="0.55"/>
-  <text x="940" y="294" text-anchor="middle"
-        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Microsoft YaHei, sans-serif"
-        font-size="17" fill="#FFB067">GO · 自动循环</text>
 </svg>
