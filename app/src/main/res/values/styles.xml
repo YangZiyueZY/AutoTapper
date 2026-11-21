@@ -1,86 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Cards -->
-    <style name="Card.AutoTapper" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
-        <item name="cardElevation">@dimen/card_elevation</item>
-        <item name="cardBackgroundColor">?attr/colorSurface</item>
-        <item name="contentPadding">16dp</item>
+    <!--
+      形状：所有容器直角（切角只给能按的块，用 shapeAppearanceOverlay 单独切掉右下角）。
+    -->
+    <style name="ShapeAppearance.AutoTapper" parent="" />
+    <style name="ShapeAppearanceOverlay.AutoTapper" parent="" />
+
+    <style name="ShapeAppearance.AutoTapper.Square">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">0dp</item>
     </style>
 
-    <style name="Card.AutoTapper.Filled" parent="Widget.Material3.CardView.Filled">
-        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
-        <item name="cardElevation">0dp</item>
-        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
-        <item name="contentPadding">16dp</item>
+    <style name="ShapeAppearanceOverlay.AutoTapper.CutButton">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
+        <item name="cornerFamilyBottomRight">cut</item>
+        <item name="cornerSizeBottomRight">8dp</item>
     </style>
 
-    <style name="Card.AutoTapper.Header" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardCornerRadius">20dp</item>
-        <item name="cardElevation">@dimen/card_elevation</item>
-        <item name="cardBackgroundColor">?attr/colorPrimary</item>
-        <item name="contentPadding">20dp</item>
+    <!--
+      字体：英文小标签用 Saira 拉宽（wght 600 / wdth 125）+ 全大写 + 字距 0.14em；
+      中文一律系统黑体（不给中文指定 saira）；数字用等宽数字 tnum。
+    -->
+    <style name="Text.AutoTapper" parent="" />
+
+    <style name="Text.AutoTapper.Eyebrow">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/ef_ink2</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">@font/saira</item>
+        <!-- aapt2 不接受在 style item 里写 fontVariationSettings（可变字体轴在运行时设置），
+             这里用 textScaleX 近似 Saira 的 125% 宽度 -->
+        <item name="android:textScaleX">1.1</item>
+        <item name="android:includeFontPadding">false</item>
     </style>
 
-    <!-- Text -->
-    <style name="Text.AutoTapper.Headline" parent="TextAppearance.Material3.HeadlineSmall">
-        <item name="android:textColor">?attr/colorOnSurface</item>
+    <style name="Text.AutoTapper.Field">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/ef_ink2</item>
+        <item name="android:fontFamily">@font/saira</item>
+        <item name="android:textScaleX">1.04</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="android:includeFontPadding">false</item>
     </style>
 
-    <style name="Text.AutoTapper.Title" parent="TextAppearance.Material3.TitleMedium">
-        <item name="android:textColor">?attr/colorOnSurface</item>
+    <!-- 首屏中文标题 -->
+    <style name="Text.AutoTapper.Display">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">@color/ef_ink</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- 段落名（眉标下面那一行中文粗体） -->
+    <style name="Text.AutoTapper.Title">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/ef_ink</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Text.AutoTapper.Body" parent="TextAppearance.Material3.BodyMedium">
-        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    <style name="Text.AutoTapper.Body">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/ef_ink2</item>
+        <item name="android:lineSpacingExtra">4dp</item>
     </style>
 
-    <style name="Text.AutoTapper.Caption" parent="TextAppearance.Material3.BodySmall">
-        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    <style name="Text.AutoTapper.Help">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/ef_ink2</item>
+        <item name="android:lineSpacingExtra">2dp</item>
     </style>
 
-    <style name="Text.AutoTapper.Label" parent="TextAppearance.Material3.LabelLarge">
-        <item name="android:textColor">?attr/colorOnSurface</item>
+    <style name="Text.AutoTapper.Label">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/ef_ink2</item>
     </style>
 
-    <!-- Buttons -->
-    <style name="Button.AutoTapper.Primary" parent="Widget.Material3.Button">
-        <item name="android:textAppearance">@style/Text.AutoTapper.Label</item>
+    <style name="Text.AutoTapper.Unit">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/ef_ink2</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:includeFontPadding">false</item>
     </style>
 
-    <style name="Button.AutoTapper.Outlined" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="android:textAppearance">@style/Text.AutoTapper.Label</item>
-    </style>
-
-    <style name="Button.AutoTapper.Text" parent="Widget.Material3.Button.TextButton">
-        <item name="android:textAppearance">@style/Text.AutoTapper.Label</item>
-    </style>
-
-    <!-- Circular icon button (mini-FAB style) -->
-    <style name="IconButton.AutoTapper.Circular" parent="Widget.Material3.Button.IconButton">
-        <item name="iconSize">24dp</item>
-        <item name="android:minWidth">48dp</item>
-        <item name="android:minHeight">48dp</item>
-        <item name="android:background">@drawable/bg_circular_button</item>
-    </style>
-
-    <!-- Text input -->
-    <style name="Input.AutoTapper.Outlined" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="hintTextColor">?attr/colorOnSurfaceVariant</item>
-        <item name="boxStrokeColor">?attr/colorOutline</item>
-    </style>
-
-    <!-- Badge -->
-    <style name="Badge.AutoTapper" parent="TextAppearance.Material3.LabelMedium">
-        <item name="android:textColor">?attr/colorPrimary</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:background">@drawable/bg_badge</item>
-        <item name="android:paddingStart">10dp</item>
-        <item name="android:paddingEnd">10dp</item>
+    <!-- 编号标签：墨底白字、直角 -->
+    <style name="Text.AutoTapper.Tag">
+        <item name="android:background">@color/ef_tag_bg</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/ef_tag_fg</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
         <item name="android:paddingTop">3dp</item>
         <item name="android:paddingBottom">3dp</item>
+    </style>
+
+    <!-- 权限状态块：默认直角 + 安静填充，配色由代码按状态改 -->
+    <style name="Text.AutoTapper.StateBlock">
+        <item name="android:background">@drawable/ef_state_block</item>
+        <item name="android:minWidth">88dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/ef_ink</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+    </style>
+
+    <!--
+      按钮：切角块，没有涟漪（rippleColor 透明），按下靠 ColorStateList 换底色。
+      切角那一侧的内边距多留 8dp（= 切角宽度），字不会压进切角。
+    -->
+    <style name="Button.AutoTapper" parent="" />
+
+    <style name="Button.AutoTapper.Base" parent="Widget.Material3.Button">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">0dp</item>
+        <!-- M3 填充按钮默认 inset 4dp（m3_btn_inset），会让 48dp 的块只画 40dp；这里清零（框架属性，不带前缀会 aapt 报错） -->
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="elevation">0dp</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:gravity">center</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.AutoTapper.CutButton</item>
+    </style>
+
+    <!-- 主要按钮：黄底墨字 -->
+    <style name="Button.AutoTapper.Primary" parent="Button.AutoTapper.Base">
+        <item name="backgroundTint">@drawable/ef_signal_tint</item>
+        <item name="android:textColor">@color/ef_on_signal</item>
+    </style>
+
+    <!-- 次要按钮：安静填充 + 墨字 -->
+    <style name="Button.AutoTapper.Secondary" parent="Button.AutoTapper.Base">
+        <item name="backgroundTint">@drawable/ef_secondary_tint</item>
+        <item name="android:textColor">@color/ef_ink</item>
+    </style>
+
+    <!-- 分段选择：当前段墨底反白（不用黄，黄留给“当前位置”和主要操作） -->
+    <style name="Button.AutoTapper.Segment" parent="Button.AutoTapper.Base">
+        <item name="backgroundTint">@drawable/ef_seg_tint</item>
+        <item name="android:textColor">@drawable/ef_seg_text_color</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">20dp</item>
+    </style>
+
+    <!-- 行内文字按钮（去授权）：静止透明、按下落一档填充；切角、墨字、触控区 48dp -->
+    <style name="Button.AutoTapper.Ghost" parent="Button.AutoTapper.Base">
+        <item name="backgroundTint">@drawable/ef_ghost_tint</item>
+        <item name="android:textColor">@color/ef_ink</item>
+        <item name="android:minWidth">72dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">20dp</item>
+    </style>
+
+    <!-- 命令栏里的按钮：深色底上的浅字，透明底 -->
+    <style name="Button.AutoTapper.Command" parent="Button.AutoTapper.Base">
+        <item name="backgroundTint">@drawable/ef_command_tint</item>
+        <item name="android:textColor">@color/ef_command_bar_text</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
+
+    <!-- 数字输入框：直角、板色填充、1px 细线，不用 Material 的圆角盒子 -->
+    <style name="Input.AutoTapper" parent="" />
+
+    <style name="Input.AutoTapper.Field">
+        <item name="android:background">@drawable/ef_edit_box</item>
+        <item name="android:textColor">@color/ef_ink</item>
+        <item name="android:textColorHint">@color/ef_ink2</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:gravity">center_vertical|start</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <!-- 滑块：轨道墨/细线，滑块头只有强调色 -->
+    <style name="Slider.AutoTapper" parent="Widget.Material3.Slider">
+        <item name="trackColorActive">@color/ef_ink</item>
+        <item name="trackColorInactive">@color/ef_rule</item>
+        <item name="trackHeight">4dp</item>
+        <item name="trackCornerRadius">0dp</item>
+        <item name="thumbColor">@color/ef_signal</item>
+        <item name="thumbStrokeColor">@color/ef_ink</item>
+        <item name="thumbStrokeWidth">2dp</item>
+        <item name="haloColor">@android:color/transparent</item>
+        <item name="tickVisible">false</item>
     </style>
 
 </resources>

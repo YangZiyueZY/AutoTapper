@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 强调色填充块：直角。用于取点浮层里的计数块（不可点，所以不切角） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/ef_signal" />
+    <corners android:radius="0dp" />
+</shape>

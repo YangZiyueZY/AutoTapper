@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 行内文字按钮（去授权）：静止透明，按下落一档安静填充。没有涟漪。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:color="@color/ef_chip" />
+    <item android:color="@android:color/transparent" />
+</selector>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 分段选择的字色：选中段用纸色（深色主题里因此是深字浅底），其余墨色 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true" android:color="@color/ef_paper" />
+    <item android:color="@color/ef_ink" />
+</selector>

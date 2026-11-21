@@ -1,43 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand colors -->
-    <color name="primary">#0F766E</color>
-    <color name="primary_dark">#115E59</color>
-    <color name="on_primary">#FFFFFF</color>
-    <color name="primary_container">#E0F2EF</color>
-    <color name="on_primary_container">#0F3D39</color>
+    <!--
+      终末地风味配色（浅色主题）。
+      规范：https://github.com/hhikr/endfield-ui-skill — 纸面 + 墨色，只有一种强调色 ef_signal，
+      只用于“当前位置 / 可操作 / 需要注意”，只做填充，上面的字用 ef_on_signal。
+      红色 ef_danger 只给删除。圆角一律 0。
+    -->
+    <color name="ic_launcher_background">#161616</color>
 
-    <color name="accent">#EA580C</color>
-    <color name="accent_dark">#C2410C</color>
-    <color name="accent_container">#FFE4C2</color>
-    <color name="on_accent_container">#5E2402</color>
+    <color name="ef_paper">#F4F4F2</color>
+    <color name="ef_panel">#FFFFFF</color>
+    <color name="ef_ink">#161616</color>
+    <color name="ef_ink2">#5C5C5C</color>
+    <color name="ef_rule">#D9D9D6</color>
+    <color name="ef_chip">#E4E4E0</color>
 
-    <color name="tertiary">#0061A4</color>
-    <color name="tertiary_container">#D1E4FF</color>
-    <color name="on_tertiary_container">#001D36</color>
+    <!-- 唯一的强调色：黄 -->
+    <color name="ef_signal">#FFFA00</color>
+    <color name="ef_on_signal">#161616</color>
+    <!-- 标出“当前位置”的线：浅色主题里是墨色 -->
+    <color name="ef_trace">#161616</color>
 
-    <!-- Semantic colors -->
-    <color name="success">#16A34A</color>
-    <color name="danger">#DC2626</color>
-    <color name="error_container">#FFDAD6</color>
-    <color name="on_error_container">#410002</color>
+    <color name="ef_tag_bg">#161616</color>
+    <color name="ef_tag_fg">#FFFFFF</color>
+    <color name="ef_danger">#B3261E</color>
+    <color name="ef_scrim">#80161616</color>
 
-    <!-- Surface / Background -->
-    <color name="bg_page">#F4F7FB</color>
-    <color name="card_bg">#FFFFFF</color>
-    <color name="surface_variant">#EAF3F1</color>
-    <color name="surface_container">#EAF3F1</color>
-    <color name="surface_container_high">#E0ECEA</color>
-    <color name="surface_container_highest">#D6E5E2</color>
+    <!-- 深色命令栏：两套主题都是深色 -->
+    <color name="ef_command_bar">#161616</color>
+    <color name="ef_command_bar_text">#EDEDED</color>
 
-    <!-- Text -->
-    <color name="text_primary">#102A43</color>
-    <color name="text_secondary">#486581</color>
+    <!-- 三色条：只出现在页顶全宽 -->
+    <color name="ef_tri_a">#FF00F0</color>
+    <color name="ef_tri_b">#FFFA00</color>
+    <color name="ef_tri_c">#00FFA2</color>
 
-    <!-- Outline -->
-    <color name="outline">#C3E4DE</color>
-    <color name="outline_variant">#D0DCEA</color>
-
-    <!-- Legacy / overlay specific -->
-    <color name="overlay_bar">#EE102A43</color>
+    <!-- 45° 斜线纹：墨色 22% -->
+    <color name="ef_hatch">#38161616</color>
+    <!-- 背景等高线：墨色 9% -->
+    <color name="ef_contour">#17161616</color>
 </resources>

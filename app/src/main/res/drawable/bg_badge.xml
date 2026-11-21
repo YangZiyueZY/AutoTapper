@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="?attr/colorPrimaryContainer" />
-    <corners android:radius="10dp" />
+<!-- 编号/计数标签的底色：墨底白字、直角（字号与内边距在样式里） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/ef_tag_bg" />
+    <corners android:radius="0dp" />
 </shape>

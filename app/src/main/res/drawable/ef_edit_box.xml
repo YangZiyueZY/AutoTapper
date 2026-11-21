@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 数字输入框：直角、板色填充、1px 细线 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/ef_panel" />
+    <stroke
+        android:width="1dp"
+        android:color="@color/ef_rule" />
+    <corners android:radius="0dp" />
+</shape>

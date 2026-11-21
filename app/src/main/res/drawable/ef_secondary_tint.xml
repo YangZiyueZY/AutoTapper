@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 次要按钮：安静填充，按下落到细线色 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:color="@color/ef_rule" />
+    <item android:color="@color/ef_chip" />
+</selector>

@@ -13,6 +13,7 @@ object AutoTapperConfig {
     const val KEY_REPEAT_COUNT = "repeat_count"
     const val KEY_TAP_DURATION_MS = "tap_duration_ms"
     const val KEY_CONTROLLER_ALPHA = "controller_alpha"
+    const val KEY_TAP_MODE = "tap_mode"
 
     // 点击配置的默认值与取值范围
     const val DEFAULT_INTERVAL_MS = 100L
@@ -40,6 +41,7 @@ object AutoTapperConfig {
     const val ACTION_STOP_CONTROLLER = "com.example.autotapper.action.STOP_CONTROLLER"
     const val ACTION_CLICK_STATE_CHANGED = "com.example.autotapper.action.CLICK_STATE_CHANGED"
     const val ACTION_CONTROLLER_ALPHA_CHANGED = "com.example.autotapper.action.CONTROLLER_ALPHA_CHANGED"
+    const val ACTION_SHIZUKU_TAP = "com.example.autotapper.action.SHIZUKU_TAP"
 
     const val EXTRA_TAP_X = "extra_tap_x"
     const val EXTRA_TAP_Y = "extra_tap_y"
@@ -47,8 +49,21 @@ object AutoTapperConfig {
     const val EXTRA_START_PICKING = "extra_start_picking"
     const val EXTRA_CURRENT_POINT_INDEX = "extra_current_point_index"
 
+    // 点击方式的两种实现：无障碍手势 / Shizuku 提权
+    const val TAP_MODE_ACCESSIBILITY = "accessibility"
+    const val TAP_MODE_SHIZUKU = "shizuku"
+
     fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    fun getTapMode(context: Context): String =
+        prefs(context).getString(KEY_TAP_MODE, TAP_MODE_ACCESSIBILITY)
+            ?.takeIf { it == TAP_MODE_SHIZUKU || it == TAP_MODE_ACCESSIBILITY }
+            ?: TAP_MODE_ACCESSIBILITY
+
+    fun saveTapMode(context: Context, mode: String) {
+        prefs(context).edit().putString(KEY_TAP_MODE, mode).apply()
+    }
 
     fun loadPoints(context: Context): List<TapPoint> {
         val prefs = prefs(context)
@@ -133,8 +148,9 @@ object AutoTapperConfig {
         prefs(context).edit().putFloat(KEY_CONTROLLER_ALPHA, alpha.coerceIn(0.3f, 1f)).apply()
     }
 
+    /** 默认完全不透明：半透明时下层应用的高对比内容会透出来，面板上的读数不好认。 */
     fun getControllerAlpha(context: Context): Float {
-        return prefs(context).getFloat(KEY_CONTROLLER_ALPHA, 0.9f).coerceIn(0.3f, 1f)
+        return prefs(context).getFloat(KEY_CONTROLLER_ALPHA, 1f).coerceIn(0.3f, 1f)
     }
 
     private fun toJson(points: List<TapPoint>): String =

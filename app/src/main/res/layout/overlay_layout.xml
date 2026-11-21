@@ -1,92 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  取点浮层（OverlayService 用 ThemeOverlay.AutoTapper.Floating 膨胀，覆盖在别的应用上）。
+  遮罩后面的整屏可点：每轻触一次记录一个点位；顶部居中的面板本身吞掉点击，不会误加点。
+  面板：板色底 + 1px 墨线 + 直角 + 顶部 5dp 墨色页签；完成键是黄底墨字（切角），取消键是安静填充。
+  注意：悬浮窗里 MaterialCardView 的底色不会绘制（MaterialShapeDrawable 在无主题的 Service 上下文里
+  填充不生效），所以这里用普通 ViewGroup + shape drawable 画面板。
+-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
 
     <View
         android:id="@+id/capture_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#33000000" />
+        android:background="@color/ef_scrim" />
 
-    <com.google.android.material.card.MaterialCardView
+    <LinearLayout
         android:id="@+id/card_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center_horizontal"
-        android:layout_margin="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/ef_panel_board"
+        android:clickable="true"
+        android:focusable="false"
         android:minWidth="@dimen/overlay_min_width"
-        app:cardBackgroundColor="?attr/colorSurfaceContainer"
-        app:cardCornerRadius="@dimen/overlay_corner_radius"
-        app:cardElevation="@dimen/overlay_elevation">
+        android:orientation="vertical">
+
+        <!-- 看板页签 -->
+        <View
+            android:layout_width="120dp"
+            android:layout_height="5dp"
+            android:background="@color/ef_ink" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingStart="18dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="18dp">
 
             <TextView
+                style="@style/Text.AutoTapper.Eyebrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/overlay_title"
-                android:textAppearance="@style/Text.AutoTapper.Headline"
-                android:textColor="?attr/colorOnSurface" />
+                android:text="@string/eyebrow_pick" />
 
             <TextView
+                style="@style/Text.AutoTapper.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center"
-                android:text="@string/overlay_hint"
-                android:textAppearance="@style/Text.AutoTapper.Body" />
+                android:layout_marginTop="4dp"
+                android:maxWidth="248dp"
+                android:text="@string/overlay_title" />
 
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Card.AutoTapper.Filled"
+            <TextView
+                style="@style/Text.AutoTapper.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="4dp"
+                android:maxWidth="248dp"
+                android:text="@string/overlay_hint" />
+
+            <!-- 计数块：强调色填充，直角（不可点） -->
+            <TextView
+                android:id="@+id/tv_picker_counter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"
-                app:cardBackgroundColor="?attr/colorSecondaryContainer">
-
-                <TextView
-                    android:id="@+id/tv_picker_counter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:textAppearance="@style/Text.AutoTapper.Label"
-                    android:textColor="?attr/colorOnSecondaryContainer" />
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_marginTop="14dp"
+                android:background="@drawable/ef_signal_block"
+                android:fontFeatureSettings="tnum"
+                android:paddingStart="14dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="6dp"
+                android:textColor="@color/ef_on_signal"
+                android:textSize="13sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="18dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_finish_capture"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Button.AutoTapper.Primary"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/finish_capture"
-                    android:textColor="?attr/colorPrimary" />
+                    android:layout_height="48dp"
+                    android:minWidth="96dp"
+                    android:text="@string/finish_capture" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_cancel_capture"
-                    style="@style/Widget.Material3.Button.TextButton"
+                    style="@style/Button.AutoTapper.Secondary"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_marginStart="8dp"
-                    android:text="@string/cancel_capture"
-                    android:textColor="?attr/colorOnSurface" />
+                    android:minWidth="96dp"
+                    android:text="@string/cancel_capture" />
             </LinearLayout>
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
+    </LinearLayout>
 </FrameLayout>

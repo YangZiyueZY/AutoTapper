@@ -12,37 +12,39 @@ import android.os.Handler
 import android.os.Looper
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
-import kotlin.random.Random
 
+/**
+ * 无障碍模式：仍然用无障碍服务的手势接口执行点击。
+ * 点击循环本身在 [TapEngine] 里，这里只负责把手势送出去。
+ */
 class AutoClickService : AccessibilityService() {
 
     private val handler = Handler(Looper.getMainLooper())
     private var receiverRegistered = false
-    private var isClicking = false
-    private var roundsCompleted = 0
-    private var pointIndex = 0
+    private var engine: TapEngine? = null
+    private var serviceConnected = false
 
-    private var points: List<TapPoint> = emptyList()
-    private var intervalMs = AutoTapperConfig.DEFAULT_INTERVAL_MS
-    private var randomExtraMs = AutoTapperConfig.DEFAULT_RANDOM_EXTRA_MS
-    private var repeatCount = AutoTapperConfig.DEFAULT_REPEAT_COUNT
-    private var tapDurationMs = AutoTapperConfig.DEFAULT_TAP_DURATION_MS
+    private val executor = object : AccessibilityTapExecutor {
+        override fun tap(x: Int, y: Int, durationMs: Long, onResult: (Boolean) -> Unit) {
+            tapWithGesture(x, y, durationMs, onResult)
+        }
+
+        override fun cancel() = Unit
+    }
 
     private val controlReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 AutoTapperConfig.ACTION_START_CLICKING -> startClicking()
-                AutoTapperConfig.ACTION_STOP_CLICKING -> {
-                    if (isClicking) {
-                        stopClicking(showToast = true, message = getString(R.string.click_stopped))
-                    }
-                }
+                AutoTapperConfig.ACTION_STOP_CLICKING -> engine?.stop(showToast = true)
             }
         }
     }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        serviceConnected = true
+        ensureEngine()
         registerControlReceiver()
         broadcastClickState(false)
         Toast.makeText(this, R.string.accessibility_ready, Toast.LENGTH_SHORT).show()
@@ -51,118 +53,70 @@ class AutoClickService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
 
     override fun onInterrupt() {
-        stopClicking(showToast = false, message = null)
+        engine?.stop()
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        serviceConnected = false
+        engine?.release()
+        return super.onUnbind(intent)
     }
 
     override fun onDestroy() {
-        stopClicking(showToast = false, message = null)
+        serviceConnected = false
+        engine?.release()
+        engine = null
         unregisterControlReceiver()
         super.onDestroy()
     }
 
-    private fun performClick() {
-        if (!isClicking) {
+    private fun ensureEngine(): TapEngine = engine ?: TapEngine(this, executor).also { engine = it }
+
+    private fun startClicking() {
+        // 切到 Shizuku 模式后，无障碍服务即使还连着也不应该再点
+        if (AutoTapperConfig.getTapMode(this) != AutoTapperConfig.TAP_MODE_ACCESSIBILITY) {
+            return
+        }
+        if (ensureEngine().start()) {
+            Toast.makeText(this, R.string.click_started, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun tapWithGesture(x: Int, y: Int, durationMs: Long, onResult: (Boolean) -> Unit) {
+        if (!serviceConnected) {
+            onResult(false)
             return
         }
 
-        if (points.isEmpty()) {
-            stopClicking(showToast = true, message = getString(R.string.point_required))
-            return
-        }
-
-        if (repeatCount > 0 && roundsCompleted >= repeatCount) {
-            stopClicking(showToast = true, message = getString(R.string.click_completed, roundsCompleted))
-            return
-        }
-
-        val point = points[pointIndex]
-        broadcastCurrentPoint(pointIndex)
-
-        val gesture: GestureDescription = GestureDescription.Builder()
+        val gesture = GestureDescription.Builder()
             .addStroke(
                 GestureDescription.StrokeDescription(
-                    Path().apply { moveTo(point.x.toFloat(), point.y.toFloat()) },
+                    Path().apply { moveTo(x.toFloat(), y.toFloat()) },
                     0,
-                    tapDurationMs
+                    durationMs
                 )
             )
             .build()
 
-        val dispatched: Boolean = dispatchGesture(
+        val dispatched = dispatchGesture(
             gesture,
             object : GestureResultCallback() {
                 override fun onCompleted(gestureDescription: GestureDescription?) {
                     super.onCompleted(gestureDescription)
-                    if (!isClicking) {
-                        return
-                    }
-
-                    pointIndex++
-                    if (pointIndex >= points.size) {
-                        pointIndex = 0
-                        roundsCompleted++
-                    }
-
-                    val randomDelay: Long = if (randomExtraMs > 0) {
-                        Random.nextLong(randomExtraMs + 1)
-                    } else {
-                        0L
-                    }
-                    scheduleNextClick(intervalMs + randomDelay)
+                    onResult(true)
                 }
 
                 override fun onCancelled(gestureDescription: GestureDescription?) {
                     super.onCancelled(gestureDescription)
-                    stopClicking(showToast = true, message = getString(R.string.click_cancelled))
+                    onResult(false)
                 }
             },
-            null
+            handler
         )
 
         if (!dispatched) {
-            stopClicking(showToast = true, message = getString(R.string.click_dispatch_failed))
+            onResult(false)
         }
-    }
-
-    private fun startClicking() {
-        points = AutoTapperConfig.loadPoints(this)
-        intervalMs = AutoTapperConfig.getIntervalMs(this)
-        randomExtraMs = AutoTapperConfig.getRandomExtraMs(this)
-        repeatCount = AutoTapperConfig.getRepeatCount(this)
-        tapDurationMs = AutoTapperConfig.getTapDurationMs(this)
-
-        if (points.isEmpty()) {
-            Toast.makeText(this, R.string.point_required, Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        roundsCompleted = 0
-        pointIndex = 0
-        isClicking = true
-        broadcastClickState(true)
-        clearPendingClicks()
-        performClick()
-        Toast.makeText(this, R.string.click_started, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun stopClicking(showToast: Boolean, message: String?) {
-        val wasClicking = isClicking
-        isClicking = false
-        clearPendingClicks()
-        broadcastClickState(false)
-
-        if (showToast && (wasClicking || !message.isNullOrBlank())) {
-            Toast.makeText(this, message ?: getString(R.string.click_stopped), Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
-
-    private fun scheduleNextClick(delayMs: Long) {
-        handler.postDelayed({ performClick() }, delayMs)
-    }
-
-    private fun clearPendingClicks() {
-        handler.removeCallbacksAndMessages(null)
     }
 
     private fun broadcastClickState(isRunning: Boolean) {
@@ -170,19 +124,7 @@ class AutoClickService : AccessibilityService() {
             Intent(AutoTapperConfig.ACTION_CLICK_STATE_CHANGED)
                 .setPackage(packageName)
                 .putExtra(AutoTapperConfig.EXTRA_IS_CLICKING, isRunning)
-                .putExtra(
-                    AutoTapperConfig.EXTRA_CURRENT_POINT_INDEX,
-                    if (isRunning) pointIndex else -1
-                )
-        )
-    }
-
-    private fun broadcastCurrentPoint(index: Int) {
-        sendBroadcast(
-            Intent(AutoTapperConfig.ACTION_CLICK_STATE_CHANGED)
-                .setPackage(packageName)
-                .putExtra(AutoTapperConfig.EXTRA_IS_CLICKING, true)
-                .putExtra(AutoTapperConfig.EXTRA_CURRENT_POINT_INDEX, index)
+                .putExtra(AutoTapperConfig.EXTRA_CURRENT_POINT_INDEX, -1)
         )
     }
 
@@ -209,7 +151,10 @@ class AutoClickService : AccessibilityService() {
             return
         }
 
-        unregisterReceiver(controlReceiver)
+        runCatching { unregisterReceiver(controlReceiver) }
         receiverRegistered = false
     }
 }
+
+/** 无障碍手势执行器：把 TapEngine 的一次点击交给 dispatchGesture。 */
+interface AccessibilityTapExecutor : TapExecutor

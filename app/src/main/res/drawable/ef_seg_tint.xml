@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  分段选择：当前段墨底反白（深色主题里 ef_ink 是浅色，于是自动变成浅底深字，两套主题下都清楚）；
+  其余安静填充；没有涟漪，按下换底色。
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true" android:color="@color/ef_ink" />
+    <item android:state_pressed="true" android:color="@color/ef_rule" />
+    <item android:color="@color/ef_chip" />
+</selector>

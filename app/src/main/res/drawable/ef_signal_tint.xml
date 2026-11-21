@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 主要按钮：静止就是黄底（触屏没有悬停），按下时黄更沉一档 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:color="#E8E300" />
+    <item android:state_enabled="false" android:color="@color/ef_chip" />
+    <item android:color="@color/ef_signal" />
+</selector>

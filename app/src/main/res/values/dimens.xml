@@ -1,26 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Cards -->
-    <dimen name="card_corner_radius">16dp</dimen>
-    <dimen name="card_corner_radius_large">20dp</dimen>
-    <dimen name="card_elevation">4dp</dimen>
-    <dimen name="card_spacing">14dp</dimen>
+    <!--
+      终末地风味：圆角一律 0，卡片不用投影。尺寸名沿用旧名，值改成风格允许的尺寸，
+      这样既有代码里 R.dimen.* 的引用不会断。
+    -->
+    <dimen name="card_corner_radius">0dp</dimen>
+    <dimen name="card_corner_radius_large">0dp</dimen>
+    <dimen name="card_elevation">0dp</dimen>
+    <dimen name="card_spacing">16dp</dimen>
     <dimen name="card_padding">16dp</dimen>
 
-    <!-- Buttons -->
-    <dimen name="button_height">52dp</dimen>
+    <!-- 触控区：不小于 48dp -->
+    <dimen name="button_height">48dp</dimen>
     <dimen name="icon_button_size">48dp</dimen>
-    <dimen name="icon_button_padding">10dp</dimen>
+    <dimen name="icon_button_padding">12dp</dimen>
     <dimen name="fab_handle_size">48dp</dimen>
 
-    <!-- Floating overlay -->
-    <dimen name="overlay_corner_radius">16dp</dimen>
+    <!-- 浮层 -->
+    <dimen name="overlay_corner_radius">0dp</dimen>
     <dimen name="overlay_padding">8dp</dimen>
     <dimen name="overlay_button_padding">8dp</dimen>
-    <dimen name="overlay_min_width">260dp</dimen>
-    <dimen name="overlay_max_width">320dp</dimen>
-    <dimen name="overlay_elevation">8dp</dimen>
+    <dimen name="overlay_min_width">280dp</dimen>
+    <dimen name="overlay_max_width">340dp</dimen>
+    <dimen name="overlay_elevation">0dp</dimen>
 
-    <!-- Status dot -->
     <dimen name="status_dot_size">10dp</dimen>
+
+    <!-- 区块尺寸 -->
+    <dimen name="command_bar_height">56dp</dimen>
+    <dimen name="strip_height">3dp</dimen>
+    <dimen name="strip_segment_width">64dp</dimen>
+    <dimen name="board_tab_width">120dp</dimen>
+    <dimen name="board_tab_height">5dp</dimen>
+    <dimen name="note_bar_width">4dp</dimen>
+    <dimen name="tag_padding_h">8dp</dimen>
+    <dimen name="tag_padding_v">3dp</dimen>
+    <dimen name="page_padding_h">16dp</dimen>
 </resources>

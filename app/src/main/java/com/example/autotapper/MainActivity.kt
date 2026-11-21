@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -21,18 +19,26 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.slider.Slider
+import rikka.shizuku.Shizuku
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var dotOverlay: View
-    private lateinit var dotAccessibility: View
+    private lateinit var tvVersion: TextView
+    private lateinit var tvHeroFields: TextView
+
     private lateinit var tvOverlayState: TextView
     private lateinit var tvAccessibilityState: TextView
+    private lateinit var tvShizukuState: TextView
+
+    private lateinit var btnModeAuto: TextView
+    private lateinit var btnModeShizuku: TextView
+    private lateinit var tvTapModeHint: TextView
+
     private lateinit var rvPoints: RecyclerView
     private lateinit var tvPointsEmpty: TextView
     private lateinit var tvPointsCount: TextView
     private lateinit var tvConfigSummary: TextView
-    private lateinit var tvVersion: TextView
+
     private lateinit var etIntervalMs: EditText
     private lateinit var etRandomExtraMs: EditText
     private lateinit var etRepeatCount: EditText
@@ -44,6 +50,26 @@ class MainActivity : AppCompatActivity() {
     private var isCheckingUpdate = false
     private var points: List<TapPoint> = emptyList()
     private lateinit var pointsAdapter: PointListAdapter
+
+    private val shizukuPermissionListener = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
+        if (requestCode == REQUEST_CODE_SHIZUKU) {
+            if (grantResult == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                setTapMode(AutoTapperConfig.TAP_MODE_SHIZUKU)
+                Toast.makeText(this, R.string.shizuku_permission_granted, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, R.string.shizuku_permission_missing, Toast.LENGTH_SHORT).show()
+            }
+            updateStatus()
+        }
+    }
+
+    private val shizukuBinderListener = Shizuku.OnBinderReceivedListener {
+        runOnUiThread { updateStatus() }
+    }
+
+    private val shizukuDeadListener = Shizuku.OnBinderDeadListener {
+        runOnUiThread { updateStatus() }
+    }
 
     private val pointReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -58,15 +84,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        dotOverlay = findViewById(R.id.dot_overlay)
-        dotAccessibility = findViewById(R.id.dot_accessibility)
+        tvVersion = findViewById(R.id.tv_version)
+        tvHeroFields = findViewById(R.id.tv_hero_fields)
+
         tvOverlayState = findViewById(R.id.tv_overlay_state)
         tvAccessibilityState = findViewById(R.id.tv_accessibility_state)
+        tvShizukuState = findViewById(R.id.tv_shizuku_state)
+
+        btnModeAuto = findViewById(R.id.btn_mode_auto)
+        btnModeShizuku = findViewById(R.id.btn_mode_shizuku)
+        tvTapModeHint = findViewById(R.id.tv_tap_mode_hint)
+
         rvPoints = findViewById(R.id.rv_points)
         tvPointsEmpty = findViewById(R.id.tv_points_empty)
         tvPointsCount = findViewById(R.id.tv_points_count)
         tvConfigSummary = findViewById(R.id.tv_config_summary)
-        tvVersion = findViewById(R.id.tv_version)
+
         etIntervalMs = findViewById(R.id.et_interval_ms)
         etRandomExtraMs = findViewById(R.id.et_random_extra_ms)
         etRepeatCount = findViewById(R.id.et_repeat_count)
@@ -85,6 +118,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btn_grant_accessibility).setOnClickListener {
             PermissionUtils.requestAccessibilityPermission(this)
         }
+        findViewById<View>(R.id.btn_grant_shizuku).setOnClickListener {
+            requestShizukuPermission()
+        }
         findViewById<View>(R.id.btn_open_controller).setOnClickListener {
             openFloatingController()
         }
@@ -92,23 +128,29 @@ class MainActivity : AppCompatActivity() {
             startUpdateCheck(silent = false)
         }
 
+        btnModeAuto.setOnClickListener {
+            setTapMode(AutoTapperConfig.TAP_MODE_ACCESSIBILITY)
+        }
+        btnModeShizuku.setOnClickListener {
+            requestShizukuPermission()
+        }
+
         sliderControllerAlpha.addOnChangeListener { _, value, fromUser ->
             if (fromUser) {
                 AutoTapperConfig.saveControllerAlpha(this, value)
                 tvControllerAlphaValue.text = getString(R.string.controller_alpha_value, value * 100)
                 sendBroadcast(
-                    Intent(AutoTapperConfig.ACTION_CONTROLLER_ALPHA_CHANGED).setPackage(packageName)
+                    Intent(AutoTapperConfig.ACTION_CONTROLLER_ALPHA_CHANGED)
+                        .setPackage(packageName)
                 )
             }
         }
 
         tvVersion.text = getString(R.string.version_label, BuildConfig.VERSION_NAME)
 
-        // 主界面没有单独的“保存”按钮，输入合法即落盘，点击开始时由服务读取
+        // 主界面没有单独的「保存」按钮，输入合法即落盘，开始点击时由服务读取
         etIntervalMs.doAfterTextChanged {
-            it?.toString()?.toLongOrNull()?.let { value ->
-                AutoTapperConfig.saveIntervalMs(this, value)
-            }
+            it?.toString()?.toLongOrNull()?.let { value -> AutoTapperConfig.saveIntervalMs(this, value) }
             updateConfigSummary()
         }
         etRandomExtraMs.doAfterTextChanged {
@@ -138,6 +180,9 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         registerPointReceiver()
+        ShizukuManager.addPermissionResultListener(shizukuPermissionListener)
+        ShizukuManager.addBinderListener(shizukuBinderListener)
+        runCatching { Shizuku.addBinderDeadListener(shizukuDeadListener) }
     }
 
     override fun onResume() {
@@ -148,6 +193,9 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         unregisterPointReceiver()
+        ShizukuManager.removePermissionResultListener(shizukuPermissionListener)
+        ShizukuManager.removeBinderListener(shizukuBinderListener)
+        runCatching { Shizuku.removeBinderDeadListener(shizukuDeadListener) }
     }
 
     private fun loadSavedConfig() {
@@ -168,30 +216,128 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateStatus() {
-        updatePermissionRow(
-            dotOverlay,
+        val overlayGranted = PermissionUtils.isOverlayPermissionGranted(this)
+        val accessibilityGranted = PermissionUtils.isAccessibilityServiceEnabled(
+            this,
+            AutoClickService::class.java
+        )
+        val shizukuState = ShizukuManager.state(this)
+
+        // 行内已经有权限名，状态块里只写状态本身
+        bindStateBlock(
             tvOverlayState,
-            R.string.overlay_permission_state,
-            PermissionUtils.isOverlayPermissionGranted(this)
+            getString(
+                if (overlayGranted) R.string.permission_granted else R.string.permission_missing
+            ),
+            overlayGranted
         )
-        updatePermissionRow(
-            dotAccessibility,
+        bindStateBlock(
             tvAccessibilityState,
-            R.string.accessibility_permission_state,
-            PermissionUtils.isAccessibilityServiceEnabled(this, AutoClickService::class.java)
+            getString(
+                if (accessibilityGranted) R.string.permission_granted
+                else R.string.permission_missing
+            ),
+            accessibilityGranted
         )
+
+        val shizukuText = when (shizukuState) {
+            ShizukuManager.State.READY -> getString(R.string.shizuku_permission_granted)
+            ShizukuManager.State.NO_PERMISSION -> getString(R.string.shizuku_permission_missing)
+            ShizukuManager.State.NOT_RUNNING -> getString(R.string.shizuku_state_not_running)
+            ShizukuManager.State.NOT_INSTALLED -> getString(R.string.shizuku_state_not_installed)
+        }
+        bindStateBlock(
+            tvShizukuState,
+            shizukuText,
+            shizukuState == ShizukuManager.State.READY
+        )
+
+        val grantedCount = listOf(overlayGranted, accessibilityGranted, shizukuState == ShizukuManager.State.READY)
+            .count { it }
+        tvHeroFields.text = getString(
+            R.string.hero_fields_template,
+            BuildConfig.VERSION_NAME,
+            points.size,
+            grantedCount
+        )
+
         loadAndShowPoints()
+        refreshTapMode()
     }
 
-    private fun updatePermissionRow(dot: View, textView: TextView, templateRes: Int, granted: Boolean) {
-        textView.text = getString(
-            templateRes,
-            getString(if (granted) R.string.permission_granted else R.string.permission_missing)
-        )
-        dot.background = GradientDrawable().apply {
-            shape = GradientDrawable.OVAL
-            setColor(Color.parseColor(if (granted) "#16A34A" else "#DC2626"))
+    private fun bindStateBlock(view: TextView, text: String, ok: Boolean) {
+        view.text = text
+        view.background = if (ok) {
+            Ef.rectBackground(this, R.color.ef_panel, R.color.ef_ink)
+        } else {
+            Ef.rectBackground(this, R.color.ef_signal)
         }
+        view.setTextColor(
+            ContextCompat.getColor(this, if (ok) R.color.ef_ink else R.color.ef_on_signal)
+        )
+    }
+
+    private fun refreshTapMode() {
+        val mode = AutoTapperConfig.getTapMode(this)
+        val shizuku = mode == AutoTapperConfig.TAP_MODE_SHIZUKU
+        btnModeAuto.isSelected = !shizuku
+        btnModeShizuku.isSelected = shizuku
+        tvTapModeHint.setText(
+            if (shizuku) R.string.tap_mode_shizuku_hint else R.string.tap_mode_auto_hint
+        )
+    }
+
+    private fun setTapMode(mode: String) {
+        val previous = AutoTapperConfig.getTapMode(this)
+        AutoTapperConfig.saveTapMode(this, mode)
+        if (previous != mode) {
+            TapScheduler.stop(this)
+        }
+        refreshTapMode()
+        Toast.makeText(
+            this,
+            if (mode == AutoTapperConfig.TAP_MODE_SHIZUKU) R.string.tap_mode_switched_shizuku
+            else R.string.tap_mode_switched_auto,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun requestShizukuPermission() {
+        when (ShizukuManager.state(this)) {
+            ShizukuManager.State.READY -> {
+                setTapMode(AutoTapperConfig.TAP_MODE_SHIZUKU)
+            }
+
+            ShizukuManager.State.NO_PERMISSION -> {
+                ShizukuManager.requestPermission(REQUEST_CODE_SHIZUKU)
+            }
+
+            ShizukuManager.State.NOT_RUNNING -> {
+                Toast.makeText(this, R.string.shizuku_not_running, Toast.LENGTH_SHORT).show()
+                openShizukuApp()
+            }
+
+            ShizukuManager.State.NOT_INSTALLED -> {
+                Toast.makeText(this, R.string.shizuku_unavailable, Toast.LENGTH_SHORT).show()
+                openShizukuDownloadPage()
+            }
+        }
+    }
+
+    private fun openShizukuDownloadPage() {
+        runCatching {
+            startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://shizuku.rikka.app/download/"))
+            )
+        }
+    }
+
+    private fun openShizukuApp() {
+        val intent = packageManager.getLaunchIntentForPackage(ShizukuManager.SHIZUKU_PACKAGE)
+        if (intent != null) {
+            runCatching { startActivity(intent) }
+        }
+        updateStatus()
     }
 
     private fun loadAndShowPoints() {
@@ -216,6 +362,16 @@ class MainActivity : AppCompatActivity() {
         rvPoints.visibility = if (points.isEmpty()) View.GONE else View.VISIBLE
         tvPointsCount.text = getString(R.string.points_count_badge, points.size)
         updateConfigSummary()
+        tvHeroFields.text = getString(
+            R.string.hero_fields_template,
+            BuildConfig.VERSION_NAME,
+            points.size,
+            listOf(
+                PermissionUtils.isOverlayPermissionGranted(this),
+                PermissionUtils.isAccessibilityServiceEnabled(this, AutoClickService::class.java),
+                ShizukuManager.state(this) == ShizukuManager.State.READY
+            ).count { it }
+        )
         Toast.makeText(this, getString(R.string.point_deleted_toast, index + 1), Toast.LENGTH_SHORT)
             .show()
     }
@@ -415,7 +571,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        unregisterReceiver(pointReceiver)
+        runCatching { unregisterReceiver(pointReceiver) }
         pointReceiverRegistered = false
+    }
+
+    companion object {
+        private const val REQUEST_CODE_SHIZUKU = 4001
     }
 }

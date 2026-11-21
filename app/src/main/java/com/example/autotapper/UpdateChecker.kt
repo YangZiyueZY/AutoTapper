@@ -254,7 +254,7 @@ object UpdateNotifier {
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_autotapper)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(
                 context.getString(R.string.update_notification_title, info.latestVersion)
             )

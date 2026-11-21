@@ -1,41 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  点位记录行：编号标签 / 坐标 / 删除，底部 1px 细线分隔。
+  按下换底色（ef_chip），不用涟漪；触控区 48dp 起。
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:background="@drawable/bg_point_item"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingStart="12dp"
-    android:paddingEnd="4dp"
-    android:paddingTop="6dp"
-    android:paddingBottom="6dp">
+    android:background="@drawable/ef_row_press"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_point_index"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/Text.AutoTapper.Body"
-        android:textColor="?attr/colorPrimary"
-        android:textStyle="bold" />
+        android:gravity="center_vertical"
+        android:minHeight="52dp"
+        android:orientation="horizontal"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
 
-    <TextView
-        android:id="@+id/tv_point_coords"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_weight="1"
-        android:textAppearance="@style/Text.AutoTapper.Body" />
+        <TextView
+            android:id="@+id/tv_point_index"
+            style="@style/Text.AutoTapper.Tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <ImageView
-        android:id="@+id/btn_point_delete"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/bg_circular_button"
-        android:contentDescription="@string/delete_point_desc"
-        android:padding="10dp"
-        android:src="@drawable/ic_overlay_delete"
-        app:tint="?attr/colorOnSurface" />
+        <TextView
+            android:id="@+id/tv_point_coords"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_weight="1"
+            android:fontFeatureSettings="tnum"
+            android:textColor="@color/ef_ink"
+            android:textSize="15sp" />
 
+        <ImageView
+            android:id="@+id/btn_point_delete"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/ef_row_press"
+            android:contentDescription="@string/delete_point_desc"
+            android:padding="13dp"
+            android:src="@drawable/ic_overlay_delete"
+            app:tint="@color/ef_danger" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/ef_rule" />
 </LinearLayout>

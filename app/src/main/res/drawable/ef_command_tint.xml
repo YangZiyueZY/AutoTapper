@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 命令栏上的文字按钮：静止透明，按下比命令栏亮一档 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:color="#2E2E2E" />
+    <item android:color="@android:color/transparent" />
+</selector>
