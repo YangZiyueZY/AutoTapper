@@ -167,6 +167,25 @@ APK 的签名算法本身是确定的，**变的是被签名的内容**：AGP �
 
 见 [CHANGELOG.md](./CHANGELOG.md)。
 
+## 许可证
+
+本项目以 **Apache License 2.0** 发布，全文见 [LICENSE](./LICENSE)；第三方组件与字体各自的许可证在 [NOTICE](./NOTICE) 里列明。
+
+```
+Copyright 2026 YangZiyueZY
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+```
+
+- 你可以自由使用、修改、再分发，包括商用；再分发时请保留版权声明与 [NOTICE](./NOTICE)。
+- 界面字体 **Saira** 单独遵循 SIL Open Font License 1.1（许可证随包附在 `app/src/main/assets/licenses/`），
+  不受 Apache 2.0 覆盖。
+- 插件（`AutoTapperPlugin` 仓库）是按需安装的独立产物，其许可证以插件仓库为准。
+
 ## 致谢
 
 界面字体 [Saira](https://github.com/googlefonts/saira-font)（SIL OFL 1.1，许可证随包附在 `app/src/main/assets/licenses/`）；
