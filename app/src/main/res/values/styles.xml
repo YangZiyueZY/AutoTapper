@@ -206,6 +206,8 @@
         <item name="thumbColor">@color/ef_signal</item>
         <item name="thumbStrokeColor">@color/ef_ink</item>
         <item name="thumbStrokeWidth">2dp</item>
+        <!-- 不写死半径时，值到 valueTo 会把拇指裁成一条竖线（右端贴边） -->
+        <item name="thumbRadius">9dp</item>
         <item name="haloColor">@android:color/transparent</item>
         <item name="tickVisible">false</item>
     </style>

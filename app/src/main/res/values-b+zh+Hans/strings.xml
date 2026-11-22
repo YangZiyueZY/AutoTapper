@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  简体中文覆盖值（繁体/其他中文区域回落到 values/）。
+  这里只放与默认值语言不一致的条目；key 与 values/strings.xml 一一对应。
+-->
+<resources>
+    <!-- 插件面板 -->
+    <string name="plugin_panel_eyebrow">// PLUGINS</string>
+    <string name="plugin_panel_title">插件</string>
+    <string name="plugin_panel_empty">还没有安装任何插件。连接仓库后，可以把需要的功能加成插件。</string>
+    <string name="plugin_repo_label">仓库</string>
+    <string name="plugin_synced_never">尚未同步</string>
+    <string name="plugin_synced_at">上次同步</string>
+    <string name="plugin_count_format">%1$d 个插件</string>
+    <string name="plugin_filter_installed">已安装</string>
+    <string name="plugin_filter_available">可获取</string>
+    <string name="plugin_filter_updates">需更新</string>
+    <string name="plugin_action_install">安装这个插件</string>
+    <string name="plugin_action_update">更新</string>
+    <string name="plugin_action_enable">启用</string>
+    <string name="plugin_action_disable">停用</string>
+    <string name="plugin_action_uninstall">删除这个插件</string>
+    <string name="plugin_action_refresh">刷新</string>
+    <string name="plugin_verified">已校验 SHA-256 与签名</string>
+    <string name="plugin_unverified">未校验，本机安装</string>
+    <string name="plugin_requires">需要能力</string>
+    <string name="plugin_missing">缺插件：%1$s</string>
+    <string name="plugin_requires_newer_host">需要更新主程序（要求 versionCode %1$d）</string>
+    <string name="plugin_install_confirm_title">安装插件</string>
+    <string name="plugin_install_confirm_body">插件与主程序拥有相同权限，请只安装你信任来源的插件。</string>
+    <string name="plugin_network_error">连不上插件仓库，请检查网络，或用本地文件安装。</string>
+    <string name="plugin_offline_install">从文件安装</string>
+    <string name="plugin_allow_unsigned">允许未签名插件</string>
+    <string name="plugin_size_format">%1$s</string>
+    <string name="plugin_api_format">API %1$d</string>
+
+    <!-- 页面与动作 -->
+    <string name="page_overview">总览</string>
+    <string name="page_plugins">插件</string>
+    <string name="page_steps">步骤流程</string>
+    <string name="page_rules">规则</string>
+    <string name="page_logs">日志</string>
+    <string name="page_timing">定时</string>
+    <string name="page_settings">设置</string>
+    <string name="page_proof">打样</string>
+
+    <string name="action_save_step">保存这一步</string>
+    <string name="action_add_step">添加步骤</string>
+    <string name="action_delete_rule">删除这条规则</string>
+    <string name="action_proof">打样</string>
+    <string name="action_stop">停止</string>
+    <string name="action_pause">暂停</string>
+    <string name="action_resume">继续</string>
+
+    <string name="empty_steps">这条规则还没有步骤，点下面的“添加步骤”开始配第一条。</string>
+
+    <!-- 点击循环（StepEngine）的提示 -->
+    <string name="click_paused">自动点击已暂停。</string>
+    <string name="click_resumed">自动点击已继续。</string>
+    <string name="rule_required">还没有任何规则，请先新建一条规则并添加步骤。</string>
+    <string name="rule_steps_required">当前规则里没有步骤，请先添加步骤。</string>
+    <string name="proof_running">打样中 %1$d/%2$d</string>
+    <string name="eyebrow_navigate">// NAVIGATE</string>
+    <string name="nav_title">功能入口</string>
+    <string name="nav_help">规则里放步骤；插件给你功能；设置管通道与授权；日志看每一步的真实结果。</string>
+    <string name="nav_open_failed">打不开这个页面</string>
+    <string name="nav_run_start">开始点击</string>
+    <string name="nav_run_stop">停止点击</string>
+    <string name="nav_run_pause">暂停</string>
+    <string name="nav_run_resume">继续</string>
+    <string name="nav_rule_none">当前规则：还没有规则</string>
+    <string name="nav_rule_current">当前规则：%1$s（%2$d 步）</string>
+    <string name="nav_run_hint_ready">点「开始点击」按当前规则执行；运行中会在这里显示状态。</string>
+    <string name="nav_rule_empty">当前规则：%1$s（0 步）· 先去「规则」里加步骤</string>
+</resources>

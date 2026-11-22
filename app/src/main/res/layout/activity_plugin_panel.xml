@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  插件面板（页面类型：控制台）。
+    命令栏（深色，// PLUGINS 眉标 + 中文标题「插件」+ 刷新）
+    三色条（3dp，全宽，只出现在页顶；与主界面同一做法）
+    内容区（FrameLayout）
+      ├ ImageView contour：左下角 140×100dp，画在最底层当背景质感，不压内容、不进列表行
+      ├ list_screen：字段行 + 分段筛选 + 提示条 + 列表 / 空状态
+      └ detail_scroll：详情第二屏（同一 Activity 内切屏，默认 GONE）
+
+  Ef* 自定义部件（EfSegmented / EfNotice / EfHatch / EfFieldRow / EfStateBlock / EfBlock）
+  没有 (Context, AttributeSet) 构造函数，不能在 XML 里 inflate：这里只留占位容器
+  （seg_holder / notice_holder / hatch_holder / detail_container），实例在 Activity 里建。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ef_paper"
+    android:orientation="vertical">
+
+    <!-- 1. 深色命令栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/ef_command_bar"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/command_bar_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/command_bar_padding_start"
+            android:paddingEnd="@dimen/command_bar_padding_end">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_panel_eyebrow"
+                    style="@style/Text.AutoTapper.Eyebrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plugin_panel_eyebrow"
+                    android:textColor="@color/ef_command_bar_text" />
+
+                <TextView
+                    android:id="@+id/tv_panel_title"
+                    style="@style/Text.AutoTapper.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/plugin_panel_title"
+                    android:textColor="@color/ef_command_bar_text" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- 刷新：墨底切角块，按下擦黄（底色由 Activity 用 EfShapeDrawable 设置） -->
+            <TextView
+                android:id="@+id/btn_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/control_min_height"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:minWidth="72dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="20dp"
+                android:text="@string/plugin_action_refresh"
+                android:textColor="@color/ef_command_bar_text"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- 命令栏底部：一小段黄块标出当前分区 -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="3dp">
+
+            <View
+                android:layout_width="@dimen/strip_segment_width"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:background="@color/ef_signal" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- 2. 三色条：全宽 3dp，三段等分，只出现在页顶 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/ef_tri_a" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/ef_tri_b" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/ef_tri_c" />
+    </LinearLayout>
+
+    <!-- 3. 内容区：等高线画在最底层，两个屏幕叠在里面 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/img_contour"
+            android:layout_width="140dp"
+            android:layout_height="100dp"
+            android:layout_gravity="bottom|start"
+            android:alpha="0.9"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no"
+            android:scaleType="fitStart"
+            android:src="@drawable/contour_b" />
+
+        <!-- 列表屏 -->
+        <LinearLayout
+            android:id="@+id/list_screen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- 仓库字段行：横排会被右侧切掉，所以允许折行（竖线分隔的四个字段各自成段） -->
+            <TextView
+                android:id="@+id/tv_fields"
+                style="@style/Text.AutoTapper.Field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/page_gutter"
+                android:layout_marginTop="@dimen/block_gap"
+                android:layout_marginEnd="@dimen/page_gutter"
+                android:lineSpacingExtra="5dp"
+                android:textColor="@color/ef_ink"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:id="@+id/seg_holder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="@dimen/page_gutter"
+                android:paddingTop="@dimen/block_gap"
+                android:paddingEnd="@dimen/page_gutter" />
+
+            <LinearLayout
+                android:id="@+id/notice_holder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="@dimen/page_gutter"
+                android:paddingTop="@dimen/block_gap"
+                android:paddingEnd="@dimen/page_gutter"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_plugins"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingStart="@dimen/page_gutter"
+                    android:paddingTop="@dimen/block_gap"
+                    android:paddingEnd="@dimen/page_gutter"
+                    android:paddingBottom="@dimen/section_gap"
+                    android:scrollbars="none" />
+
+                <FrameLayout
+                    android:id="@+id/hatch_holder"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/page_gutter"
+                    android:layout_marginTop="@dimen/block_gap"
+                    android:layout_marginEnd="@dimen/page_gutter"
+                    android:layout_marginBottom="@dimen/section_gap"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- 详情屏（第二屏，内容由 Activity 生成） -->
+        <ScrollView
+            android:id="@+id/detail_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:scrollbars="none"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/detail_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="@dimen/page_gutter"
+                android:paddingTop="@dimen/block_gap"
+                android:paddingEnd="@dimen/page_gutter"
+                android:paddingBottom="@dimen/section_gap" />
+        </ScrollView>
+    </FrameLayout>
+</LinearLayout>

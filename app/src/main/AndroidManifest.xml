@@ -8,6 +8,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- 截图：Android 14 起前台服务必须声明 mediaProjection 类型（配下面的 service 节点） -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <!-- 插件面板"从本地文件安装"要读用户选的 jar -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <!-- Shizuku 模式：需要能看见 Shizuku 本体（Android 11+ 包可见性） -->
     <queries>
@@ -15,6 +20,7 @@
     </queries>
 
     <application
+        android:name=".AutoTapperApp"
         android:allowBackup="true"
         android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
@@ -30,6 +36,51 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 规则与步骤：// RULES / // STEPS -->
+        <activity
+            android:name="com.example.autotapper.RulesActivity"
+            android:exported="false"
+            android:parentActivityName="com.example.autotapper.MainActivity" />
+
+        <!-- 设置：// SETTINGS（注入通道、截图授权、识字服务、仓库地址、允许未签名） -->
+        <activity
+            android:name="com.example.autotapper.SettingsActivity"
+            android:exported="false"
+            android:parentActivityName="com.example.autotapper.MainActivity" />
+
+        <!-- 日志：// LOGS -->
+        <activity
+            android:name="com.example.autotapper.LogsActivity"
+            android:exported="false"
+            android:parentActivityName="com.example.autotapper.MainActivity" />
+
+        <!-- 插件面板：// PLUGINS -->
+        <activity
+            android:name="com.example.autotapper.PluginPanelActivity"
+            android:exported="false"
+            android:parentActivityName="com.example.autotapper.MainActivity" />
+
+        <!-- 插件步骤编辑器：宿主用 ScreenSpec 渲染插件返回的字段 -->
+        <activity
+            android:name="com.example.autotapper.PluginStepEditorActivity"
+            android:exported="false"
+            android:parentActivityName="com.example.autotapper.MainActivity" />
+
+        <!-- 截图授权中转：透明、无界面，只负责拉起系统授权弹窗并把结果交给 ScreenCaptureService -->
+        <activity
+            android:name="com.example.autotapper.capture.CapturePermissionActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:finishOnTaskLaunch="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!-- 截图前台服务：MediaProjection 必须跑在前台服务里（Android 10+） -->
+        <service
+            android:name="com.example.autotapper.capture.ScreenCaptureService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
 
         <service
             android:name="com.example.autotapper.AutoClickService"

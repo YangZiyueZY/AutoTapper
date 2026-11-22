@@ -142,6 +142,8 @@
 
                         <include layout="@layout/view_hero" />
 
+                        <include layout="@layout/view_nav" />
+
                         <include layout="@layout/view_permissions" />
 
                         <include layout="@layout/view_tap_mode" />

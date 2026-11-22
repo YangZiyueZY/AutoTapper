@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 插件请求画区域时的悬浮层文案 -->
+    <string name="region_pick_title">拖出一块区域</string>
+    <string name="region_pick_hint">在屏幕上按住并拖动，松手即完成；点「取消」或按返回放弃。</string>
+    <string name="region_pick_size">宽 %1$d × 高 %2$d 像素</string>
+    <string name="region_pick_saved_toast">已保存区域：%1$s</string>
+    <string name="region_pick_cancelled_toast">已取消画区域。</string>
+    <string name="region_pick_permission_required">需要悬浮窗权限才能画区域</string>
+    <string name="region_pick_timeout_warn">等待画区域超时，已取消本次请求</string>
+    <string name="region_pick_start_failed_warn">悬浮控制器未就绪，无法画区域</string>
+</resources>

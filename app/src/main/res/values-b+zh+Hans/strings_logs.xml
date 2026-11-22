@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  日志页自己的文案，前缀统一 logs_，避免和 values/strings.xml 以及其他模块的 strings_*.xml 撞名。
+  本工程惯例：values/ 直接放中文，values-b+zh+Hans/ 也放中文（保持一致）；中文引号一律用「」。
+-->
+<resources>
+    <string name="logs_eyebrow">// LOGS</string>
+    <string name="logs_title">日志</string>
+    <string name="logs_filter_all">全部</string>
+    <string name="logs_filter_info">信息</string>
+    <string name="logs_filter_warn">警告</string>
+    <string name="logs_filter_error">错误</string>
+    <string name="logs_filter_result">结果</string>
+    <string name="logs_filter_count">%1$s %2$d</string>
+    <string name="logs_action_clear">清空</string>
+    <string name="logs_action_export">导出</string>
+    <string name="logs_search_hint">关键字过滤</string>
+    <string name="logs_empty">还没有日志。跑一次规则，这里会出现每一步的结果。</string>
+    <string name="logs_paused_hint">已暂停自动滚动 · 点这里继续</string>
+    <string name="logs_paused_action">继续</string>
+    <string name="logs_export_done">已导出 %1$d 行：%2$s</string>
+    <string name="logs_export_failed">导出失败：%1$s</string>
+    <string name="logs_clear_failed">清空日志失败：%1$s</string>
+    <string name="logs_step_index">#%1$d</string>
+</resources>

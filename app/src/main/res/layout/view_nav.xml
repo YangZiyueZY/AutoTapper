@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  功能入口（左栏第 1.5 段，紧跟 hero）：
+  终末地把"去哪"做成切角块，切角只给能按的东西。四个块等宽、48dp 触控高度，
+  由 MainActivity.setupNavRow() 用 EfBlock 实例化（Ef* 部件没有 (Context, AttributeSet)
+  构造，不能在 XML 里 inflate，所以这里只放容器）。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/section_gap"
+        android:background="@color/ef_rule" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Eyebrow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/eyebrow_navigate" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/nav_title"
+        android:textSize="@dimen/section_title_size" />
+
+    <LinearLayout
+        android:id="@+id/nav_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal" />
+
+    <!-- 开始/停止：主界面必须能直接启停，不能只靠悬浮控制器（那要先授权悬浮窗） -->
+    <LinearLayout
+        android:id="@+id/run_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" />
+
+    <TextView
+        android:id="@+id/tv_run_hint"
+        style="@style/Text.AutoTapper.Help"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Help"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/nav_help" />
+</LinearLayout>

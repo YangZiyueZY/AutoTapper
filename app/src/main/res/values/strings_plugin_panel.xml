@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  插件面板（M2）自己的文案：前缀统一 pp_，避免和 values/strings.xml 里的 plugin_* 撞名。
+  本工程惯例是「values/ 直接放中文」，英文覆盖留给需要时再加；这里保持与全工程一致。
+  中文里的引号一律用「」，不用英文引号。
+-->
+<resources>
+    <string name="pp_synced_never">从未同步</string>
+    <string name="pp_filter_count">%1$s %2$d</string>
+    <string name="pp_state_on">已启用</string>
+    <string name="pp_state_off">已停用</string>
+    <string name="pp_state_check">需要你看一眼</string>
+    <string name="pp_state_newer_host">需更新主程序</string>
+    <string name="pp_state_update">有新版本</string>
+    <string name="pp_state_installable">可安装</string>
+    <string name="pp_cap_screenshot">截图</string>
+    <string name="pp_cap_network">网络</string>
+    <string name="pp_cap_accessibility">无障碍</string>
+    <string name="pp_cap_shizuku">Shizuku</string>
+    <string name="pp_cap_overlay">悬浮窗</string>
+    <string name="pp_cap_none">无额外能力</string>
+    <string name="pp_back_to_list">返回列表</string>
+    <string name="pp_eyebrow_plugin">// PLUGIN</string>
+    <string name="pp_eyebrow_about">// ABOUT</string>
+    <string name="pp_eyebrow_capability">// CAPABILITY</string>
+    <string name="pp_eyebrow_source">// SOURCE</string>
+    <string name="pp_eyebrow_actions">// ACTIONS</string>
+    <string name="pp_about_label">说明</string>
+    <string name="pp_capability_label">能力声明</string>
+    <string name="pp_source_label">来源与校验</string>
+    <string name="pp_size_label">体积</string>
+    <string name="pp_api_label">API 版本</string>
+    <string name="pp_state_label">状态</string>
+    <string name="pp_size_unknown">未知</string>
+    <string name="pp_notice_offline_action">改用本地文件安装</string>
+    <string name="pp_notice_index_missing">还没有仓库索引，点「刷新」同步一次。</string>
+    <string name="pp_preparing">正在读取已安装的插件，稍等一下。</string>
+    <string name="pp_empty_available">仓库里还没有可安装的插件。</string>
+    <string name="pp_empty_updates">已安装的插件都已是最新版本。</string>
+    <string name="pp_unsigned_disabled">先在设置里打开「允许未签名插件」。当前版本还没有设置界面，可以先用仓库安装插件。</string>
+    <string name="pp_unsigned_denied_title">本地安装未打开</string>
+    <string name="pp_uninstall_title">卸载「%1$s」</string>
+    <string name="pp_uninstall_body">卸载会删掉插件文件、这个插件的全部配置，规则里它的步骤也会一并消失。确定卸载吗？</string>
+    <string name="pp_uninstall_done">插件已卸载。</string>
+    <string name="pp_uninstall_failed">卸载失败，请稍后再试。</string>
+    <string name="pp_enable_failed">启用失败，请稍后再试。</string>
+    <string name="pp_disable_failed">停用失败，请稍后再试。</string>
+    <string name="pp_install_success">插件已安装。</string>
+    <string name="pp_install_failed">安装失败：%1$s</string>
+    <string name="pp_install_progress">正在下载 %1$d%%</string>
+    <string name="pp_install_progress_unknown">正在下载…</string>
+    <string name="pp_sync_done">同步完成，共 %1$d 个插件。</string>
+    <string name="pp_sync_failed">同步失败：%1$s</string>
+    <string name="pp_pick_not_jar">这个文件不是插件 jar 包。</string>
+    <string name="pp_pick_copy_failed">读不到你选的文件。</string>
+    <string name="pp_load_error_label">装载失败</string>
+    <string name="pp_confirm_install">安装</string>
+    <string name="pp_cancel">取消</string>
+    <string name="pp_ok">知道了</string>
+    <string name="pp_open_failed">打不开插件面板。</string>
+    <string name="pp_installed_at">安装于</string>
+    <string name="pp_digest_mismatch">文件摘要不一致，插件包可能损坏或被改动过。</string>
+    <string name="pp_row_index">No.%1$02d</string>
+    <string name="pp_state_not_installed">未安装</string>
+    <string name="pp_source_repo_pending">从仓库安装时会校验 SHA-256</string>
+    <string name="pp_preview_spec">预览设置页</string>
+    <string name="pp_preview_failed">打不开设置页预览</string>
+</resources>

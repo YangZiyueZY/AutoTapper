@@ -9,8 +9,8 @@ android {
         applicationId "com.example.autotapper"
         minSdk 26
         targetSdk 34
-        versionCode 6
-        versionName "1.3.0"
+        versionCode 7
+        versionName "1.4.0"
     }
 
     buildTypes {
@@ -41,7 +41,54 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'com.google.android.material:material:1.12.0'
 
+    // 插件步骤的 execute 是 suspend（截图/OCR 都是异步的），显式声明协程依赖
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
+
     // Shizuku 授权模式：api 用 Shizuku.newProcess / 权限接口，provider 提供授权回调
     implementation 'dev.rikka.shizuku:api:13.1.5'
     implementation 'dev.rikka.shizuku:provider:13.1.5'
+
+    // 单元测试：只测纯逻辑（JSON 编解码、区间/区域抽样、仓库地址与镜像 URL、
+    // 策略决定映射）。android.* 在 unit test 里是抛异常的桩，所以这些类不碰 android。
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
+}
+
+// ---------------------------------------------------------------------------
+// 可复现构建：同一份源码连续构建两次，产出应完全一致（sha256 相同）。
+//
+// 为什么默认产物不一致：APK 的签名算法（SHA256withRSA / v1+v2+v3）本身是确定的，
+// 变的是**被签名的内容**——AGP 打包时把每个 zip 条目的 mtime 写成构建时间，
+// 摘要因此每次都不同。tools/reproducible_apk.py 先按固定时间戳重排重打包、
+// 再 zipalign、最后用同一把密钥重签，于是产物只取决于输入内容。
+//
+//   ./gradlew :app:reproApk
+//   # 连跑两次，对 app/build/outputs/apk/debug/app-debug.apk 取 sha256 应相同
+// ---------------------------------------------------------------------------
+tasks.register("reproApk") {
+    group = "build"
+    description = "产出可复现的 debug APK（固定时间戳重打包 + 同一密钥重签）"
+    dependsOn("assembleDebug")
+    doLast {
+        def sdk = android.sdkDirectory
+        def buildTools = new File(sdk, "build-tools/" + android.buildToolsVersion)
+        def keystore = new File(System.getProperty("user.home"), ".android/debug.keystore")
+        if (!keystore.isFile()) {
+            throw new GradleException("找不到 debug 签名密钥：" + keystore.absolutePath)
+        }
+        def apk = new File(project.buildDir, "outputs/apk/debug/app-debug.apk")
+        // Windows 上通常是 python，Linux/macOS 上通常是 python3；DSH_PYTHON 可以显式指定
+        def defaultPython = org.gradle.internal.os.OperatingSystem.current().isWindows() ? "python" : "python3"
+        def python = System.getenv("DSH_PYTHON") ?: defaultPython
+        project.exec {
+            commandLine python,
+                    new File(rootDir, "tools/reproducible_apk.py").absolutePath,
+                    "--apk", apk.absolutePath,
+                    "--build-tools", buildTools.absolutePath,
+                    "--ks", keystore.absolutePath,
+                    "--ks-alias", "androiddebugkey",
+                    "--ks-pass", "android",
+                    "--key-pass", "android"
+        }
+    }
 }

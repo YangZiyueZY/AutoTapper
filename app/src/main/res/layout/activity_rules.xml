@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  规则与步骤（页面类型：控制台）。
+    命令栏（深色，眉标 // RULES 或 // STEPS + 中文标题 + 右上角一个动作块）
+    三色条（3dp，全宽，只出现在页顶；与主界面同一做法）
+    内容区（FrameLayout）
+      ├ ImageView contour：右下角 140×100dp，画在最底层当背景质感，不压内容、不进列表行
+      ├ list_screen：规则列表 / 空状态 + 底部回收站入口
+      └ steps_screen：步骤列表（同一 Activity 内第二屏，默认 GONE）
+
+  Ef* 自定义部件（EfHatch / EfStateBlock / EfBlock 等）没有 (Context, AttributeSet) 构造函数，
+  不能在 XML 里 inflate：这里只留占位容器（hatch_holder / step_hatch_holder / back_holder），
+  实例在 Activity 里建。列表行也全部由适配器用代码构建，理由同上。
+
+  命令栏的眉标 / 标题 / 右侧按钮文案随屏幕切换，所以这里不写死 text，由 Activity 每次渲染时设置。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ef_paper"
+    android:orientation="vertical">
+
+    <!-- 1. 深色命令栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/ef_command_bar"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/command_bar_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/command_bar_padding_start"
+            android:paddingEnd="@dimen/command_bar_padding_end">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_command_eyebrow"
+                    style="@style/Text.AutoTapper.Eyebrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/ef_command_bar_text" />
+
+                <TextView
+                    android:id="@+id/tv_command_title"
+                    style="@style/Text.AutoTapper.Title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/ef_command_bar_text" />
+            </LinearLayout>
+
+            <!-- 右上角动作块：墨底切角，按下擦黄（底色由 Activity 用 EfShapeDrawable 设置） -->
+            <TextView
+                android:id="@+id/btn_command_action"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/control_min_height"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:minWidth="72dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="20dp"
+                android:textColor="@color/ef_command_bar_text"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- 命令栏底部：一小段黄块标出当前分区 -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="3dp">
+
+            <View
+                android:layout_width="@dimen/strip_segment_width"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:background="@color/ef_signal" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- 2. 三色条：全宽 3dp，三段等分，只出现在页顶 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/ef_tri_a" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/ef_tri_b" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/ef_tri_c" />
+    </LinearLayout>
+
+    <!-- 3. 内容区：等高线画在最底层，两个屏幕叠在里面 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/img_contour"
+            android:layout_width="140dp"
+            android:layout_height="100dp"
+            android:layout_gravity="bottom|end"
+            android:alpha="0.9"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no"
+            android:scaleType="fitEnd"
+            android:src="@drawable/contour_a" />
+
+        <!-- 第一屏：规则列表 -->
+        <LinearLayout
+            android:id="@+id/list_screen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_rules"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingStart="@dimen/page_gutter"
+                    android:paddingTop="@dimen/block_gap"
+                    android:paddingEnd="@dimen/page_gutter"
+                    android:paddingBottom="@dimen/block_gap"
+                    android:scrollbars="none" />
+
+                <FrameLayout
+                    android:id="@+id/hatch_holder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/page_gutter"
+                    android:layout_marginTop="@dimen/block_gap"
+                    android:layout_marginEnd="@dimen/page_gutter"
+                    android:layout_marginBottom="@dimen/section_gap"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <!-- 底部回收站入口：一条细线 + 一整行可点区域 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ef_rule" />
+
+            <TextView
+                android:id="@+id/btn_trash"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/control_min_height"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
+                android:paddingStart="@dimen/page_gutter"
+                android:paddingEnd="@dimen/page_gutter"
+                android:textColor="@color/ef_ink"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- 第二屏：某条规则的步骤列表 -->
+        <LinearLayout
+            android:id="@+id/steps_screen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/back_holder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="@dimen/page_gutter"
+                android:paddingTop="@dimen/block_gap"
+                android:paddingEnd="@dimen/page_gutter" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_steps"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingStart="@dimen/page_gutter"
+                    android:paddingTop="@dimen/block_gap"
+                    android:paddingEnd="@dimen/page_gutter"
+                    android:paddingBottom="@dimen/section_gap"
+                    android:scrollbars="none" />
+
+                <FrameLayout
+                    android:id="@+id/step_hatch_holder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/page_gutter"
+                    android:layout_marginTop="@dimen/block_gap"
+                    android:layout_marginEnd="@dimen/page_gutter"
+                    android:layout_marginBottom="@dimen/section_gap"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

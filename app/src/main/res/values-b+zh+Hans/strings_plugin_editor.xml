@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 插件步骤编辑器：简体中文（默认 values 里是英文） -->
+    <string name="plugin_spec_eyebrow">// STEP</string>
+    <string name="plugin_spec_title">步骤设置</string>
+    <string name="plugin_spec_empty">这个插件没有提供任何设置项</string>
+    <string name="plugin_spec_save">保存</string>
+    <string name="plugin_spec_cancel">取消</string>
+    <string name="plugin_spec_coerced">数值超出范围，已调整到 %1$d 到 %2$d 之间</string>
+    <string name="plugin_spec_switch_on">已开启</string>
+    <string name="plugin_spec_switch_off">已关闭</string>
+    <string name="plugin_spec_empty_option">默认</string>
+    <string name="plugin_spec_no_regions">还没有区域，请先在首页添加一个区域</string>
+    <string name="plugin_spec_region_row">%1$s / %2$d × %3$d</string>
+    <string name="plugin_spec_check_on">[ x ]</string>
+    <string name="plugin_spec_check_off">[   ]</string>
+    <string name="plugin_spec_add_row">增加一条</string>
+    <string name="plugin_spec_delete_row">删除</string>
+    <string name="plugin_spec_step_hint">第几步（从 1 开始）</string>
+    <string name="plugin_spec_saved">步骤设置已保存</string>
+    <string name="plugin_spec_load_failed">无法加载插件设置</string>
+</resources>

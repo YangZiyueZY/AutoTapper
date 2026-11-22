@@ -20,6 +20,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.autotapper.engine.RuleStore
 import com.google.android.material.slider.Slider
 import rikka.shizuku.Shizuku
 
@@ -49,6 +50,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvControllerAlphaValue: TextView
 
     private var pointReceiverRegistered = false
+
+    /** 主界面的「开始/停止」按钮与提示；引擎状态变化时由广播驱动刷新。 */
+    private var runButton: EfBlock? = null
+    private var runHint: TextView? = null
+    private var isRunning = false
     private var isCheckingUpdate = false
     private var points: List<TapPoint> = emptyList()
     private lateinit var pointsAdapter: PointListAdapter
@@ -78,6 +84,10 @@ class MainActivity : AppCompatActivity() {
             when (intent?.action) {
                 AutoTapperConfig.ACTION_POINT_SELECTED -> loadAndShowPoints()
                 AutoTapperConfig.ACTION_CONTROLLER_ALPHA_CHANGED -> refreshControllerAlpha()
+                AutoTapperConfig.ACTION_CLICK_STATE_CHANGED -> {
+                    isRunning = intent.getBooleanExtra(AutoTapperConfig.EXTRA_IS_CLICKING, false)
+                    refreshRunButton()
+                }
             }
         }
     }
@@ -134,6 +144,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btn_check_update).setOnClickListener {
             startUpdateCheck(silent = false)
         }
+
+        setupNavRow()
+        setupRunRow()
 
         btnModeAuto.setOnClickListener {
             setTapMode(AutoTapperConfig.TAP_MODE_ACCESSIBILITY)
@@ -407,6 +420,97 @@ class MainActivity : AppCompatActivity() {
         ).show()
     }
 
+    /**
+     * 功能入口：四个等宽切角块（规则 / 插件 / 设置 / 日志）。
+     *
+     * 之前这些入口一个都没有——页面做出来了，用户找不到。命令栏只有 48dp 高，
+     * 再塞按钮就会和版本号、检查更新挤在一起，所以入口单独占一段。
+     * EfBlock 自带"按下擦黄"，四个块等宽（weight=1），触控高度取 control_min_height。
+     */
+    private fun setupNavRow() {
+        val row = findViewById<LinearLayout?>(R.id.nav_row)
+        if (row == null) {
+            LogBus.warn("找不到导航行 nav_row，功能入口不可用")
+            return
+        }
+        row.removeAllViews()
+        val height = resources.getDimensionPixelSize(R.dimen.control_min_height)
+        val gap = Ef.dp(this, 8)
+        val entries = listOf(
+            getString(R.string.page_rules) to RulesActivity::class.java,
+            getString(R.string.page_plugins) to PluginPanelActivity::class.java,
+            getString(R.string.page_settings) to SettingsActivity::class.java,
+            getString(R.string.page_logs) to LogsActivity::class.java
+        )
+        entries.forEachIndexed { index, (label, target) ->
+            val block = EfBlock(this, label, false, false, 0, 13f)
+            block.layoutParams = LinearLayout.LayoutParams(0, height, 1f).apply {
+                if (index != entries.lastIndex) marginEnd = gap
+            }
+            block.setOnClickListener { openPage(target) }
+            row.addView(block)
+        }
+    }
+
+    /** 打开一个子页面；页面本身出问题也不能把主界面拖下水。 */
+    private fun openPage(target: Class<*>) {
+        runCatching { startActivity(Intent(this, target)) }
+            .onFailure {
+                LogBus.warn("打开页面失败：" + target.simpleName + " " + it.javaClass.simpleName)
+                Toast.makeText(this, R.string.nav_open_failed, Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    /**
+     * 「开始 / 停止」与当前规则摘要。
+     *
+     * 之前主界面没有任何启停入口：必须先去授权悬浮窗、再打开控制器才能开始，
+     * 规则化之后这条路径太长了。这里给一个直给的按钮，状态由引擎广播驱动。
+     */
+    private fun setupRunRow() {
+        val row = findViewById<LinearLayout?>(R.id.run_row) ?: return
+        row.removeAllViews()
+        val button = EfBlock(this, getString(R.string.nav_run_start), primary = true, danger = false, iconRes = 0, textSizeSp = 14f)
+        button.layoutParams = LinearLayout.LayoutParams(
+            0,
+            resources.getDimensionPixelSize(R.dimen.control_min_height),
+            1f
+        )
+        button.setOnClickListener { toggleRun() }
+        row.addView(button)
+        runButton = button
+        runHint = findViewById(R.id.tv_run_hint)
+        refreshRunButton()
+    }
+
+    private fun toggleRun() {
+        if (isRunning) {
+            TapScheduler.stop(this)
+            isRunning = false
+            refreshRunButton()
+            return
+        }
+        runCatching { TapScheduler.start(this) }
+            .onFailure {
+                LogBus.warn("开始点击失败：" + it.javaClass.simpleName)
+                Toast.makeText(this, R.string.nav_open_failed, Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    /** 按钮文案与提示随"有没有规则 / 在不在跑"变化，读数不写死。 */
+    private fun refreshRunButton() {
+        val button = runButton ?: return
+        button.setLabel(getString(if (isRunning) R.string.nav_run_stop else R.string.nav_run_start))
+        val hint = runHint ?: return
+        val rule = runCatching { RuleStore.currentRule(this) }.getOrNull()
+        hint.text = when {
+            isRunning -> getString(R.string.nav_run_hint_ready)
+            rule == null -> getString(R.string.nav_rule_none)
+            rule.steps.isEmpty() -> getString(R.string.nav_rule_empty, rule.name)
+            else -> getString(R.string.nav_rule_current, rule.name, rule.steps.size)
+        }
+    }
+
     private fun startUpdateCheck(silent: Boolean) {
         if (isCheckingUpdate) {
             return
@@ -567,6 +671,7 @@ class MainActivity : AppCompatActivity() {
         val filter = IntentFilter().apply {
             addAction(AutoTapperConfig.ACTION_POINT_SELECTED)
             addAction(AutoTapperConfig.ACTION_CONTROLLER_ALPHA_CHANGED)
+            addAction(AutoTapperConfig.ACTION_CLICK_STATE_CHANGED)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(pointReceiver, filter, Context.RECEIVER_NOT_EXPORTED)

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  M5 截图与识字的中文覆盖值。key 与 values/strings_capture_ocr.xml 一一对应。
+-->
+<resources>
+    <!-- 截图前台服务 -->
+    <string name="capture_notification_channel">屏幕截图</string>
+    <string name="capture_notification_title">AutoTapper 正在截取屏幕</string>
+    <string name="capture_notification_text">插件可以读屏。随时可以在这条通知里停止共享。</string>
+    <string name="capture_unavailable">这台设备没有屏幕录制服务，截图用不了。</string>
+    <string name="capture_permission_denied">没有拿到截图授权，需要读屏的步骤会一直不可用。</string>
+    <string name="capture_start_failed">截图服务没能起来，请再允许一次屏幕共享。</string>
+
+    <!-- 识字服务状态（设置页显示） -->
+    <string name="ocr_status_disabled">识字已关闭；需要读字的步骤会报告能力不可用。</string>
+    <string name="ocr_status_no_token">识字还没配访问令牌，填上 AI Studio 的访问令牌就能用。</string>
+    <string name="ocr_status_bad_endpoint">识字服务地址不是有效的 https 地址，请到设置里检查。</string>
+    <string name="ocr_status_ready">识字已就绪，请求发往 %1$s。</string>
+
+    <!-- 识字失败原因（一句人话，插件原样写进日志） -->
+    <string name="ocr_error_not_configured">识字服务还没配置，请先到设置里填写访问令牌。</string>
+    <string name="ocr_error_encode">截图转不成图片文件，这次没有上传。</string>
+    <string name="ocr_error_empty">识字服务没有识别出任何文字。</string>
+    <string name="ocr_error_failed">识字任务失败。</string>
+    <string name="ocr_error_timeout">识字超时了，等了 %1$d 秒还没有结果。</string>
+    <string name="ocr_error_network">连不上识字服务，请检查网络（%1$s）。</string>
+    <string name="ocr_error_unexpected">识字过程中出了意外（%1$s）。</string>
+    <string name="ocr_error_http_auth">识字服务拒绝了访问令牌（HTTP %1$d），请到设置里重新填一次 AI Studio 令牌。</string>
+    <string name="ocr_error_http_too_large">图片太大，识字服务拒收（HTTP 413）。</string>
+    <string name="ocr_error_http_bad_request">识字服务说请求参数不对（HTTP 422），请检查设置里的服务地址。</string>
+    <string name="ocr_error_http_quota">今天的免费额度用完了（HTTP 429），明天再试，或去 AI Studio 申请提高额度。</string>
+    <string name="ocr_error_http_busy">识字服务当前繁忙（HTTP %1$d），等一会儿再试。</string>
+    <string name="ocr_error_http_other">识字服务返回了意外的状态码（HTTP %1$d）。</string>
+</resources>

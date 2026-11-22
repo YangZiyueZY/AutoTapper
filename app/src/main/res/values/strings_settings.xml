@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  设置页的文案。单独成文件是为了不和别的模块抢 strings.xml；
+  Android 会自动合并多个 values 文件。与全工程惯例一致：values/ 放中文。
+-->
+<resources>
+    <!-- 页面本身 -->
+    <string name="set_eyebrow">// SETTINGS</string>
+    <string name="set_title">设置</string>
+    <string name="set_common_cancel">取消</string>
+    <string name="set_common_ok">知道了</string>
+    <string name="set_action_failed">这一步没成功，原因写进运行日志了。</string>
+    <string name="set_save_failed">保存没成功，原因写进运行日志了。</string>
+    <string name="set_render_failed">设置页没画出来，退出去再进一次试试。</string>
+
+    <!-- 分节眉标与标题 -->
+    <string name="set_eyebrow_inject">// INJECT</string>
+    <string name="set_section_inject">注入通道</string>
+    <string name="set_eyebrow_capture">// CAPTURE</string>
+    <string name="set_section_capture">屏幕截图</string>
+    <string name="set_eyebrow_ocr">// OCR</string>
+    <string name="set_section_ocr">识字服务</string>
+    <string name="set_eyebrow_plugins">// PLUGINS</string>
+    <string name="set_section_plugins">插件仓库</string>
+    <string name="set_eyebrow_timing">// TIMING</string>
+    <string name="set_section_timing">时间校准</string>
+    <string name="set_eyebrow_logs">// LOGS</string>
+    <string name="set_section_logs">运行日志</string>
+
+    <!-- 注入通道 -->
+    <string name="set_inject_mode_accessibility">无障碍</string>
+    <string name="set_inject_mode_shizuku">Shizuku</string>
+    <string name="set_inject_state_label">通道状态</string>
+    <string name="set_inject_accessibility_on">无障碍服务已启用，可以用手势点击</string>
+    <string name="set_inject_accessibility_off">无障碍服务没启用，点不了</string>
+    <string name="set_inject_shizuku_ready">Shizuku 已授权，可以直接注入</string>
+    <string name="set_inject_shizuku_no_permission">Shizuku 在运行，但还没授权给本应用</string>
+    <string name="set_inject_shizuku_not_running">Shizuku 服务没在运行</string>
+    <string name="set_inject_shizuku_not_installed">这台机器上没有装 Shizuku</string>
+    <string name="set_inject_state_unknown">状态读不出来</string>
+    <string name="set_inject_switch_hint">切换后需要重新开始才会生效。</string>
+
+    <!-- 屏幕截图 -->
+    <string name="set_capture_status_label">截图状态</string>
+    <string name="set_capture_running">已授权，正在截取</string>
+    <string name="set_capture_idle">未授权</string>
+    <string name="set_capture_grant">授权屏幕截图</string>
+    <string name="set_capture_stop">停止截图</string>
+    <string name="set_capture_note">截图只给需要识图/识字的插件用，插件每次读取都会单独记日志。</string>
+
+    <!-- 识字服务 -->
+    <string name="set_ocr_token_label">访问令牌</string>
+    <string name="set_ocr_token_hint">AI Studio 访问令牌</string>
+    <string name="set_ocr_token_show">显示</string>
+    <string name="set_ocr_token_hide">隐藏</string>
+    <string name="set_ocr_endpoint_label">服务地址</string>
+    <string name="set_ocr_endpoint_hint">https://</string>
+    <string name="set_ocr_enable_label">启用识字</string>
+    <string name="set_ocr_status_label">当前状态</string>
+    <string name="set_ocr_status_none">未配置</string>
+    <string name="set_ocr_status_ready">已配置（token 尾号 %1$s）</string>
+    <string name="set_ocr_status_off_suffix">已停用</string>
+    <string name="set_ocr_status_endpoint_suffix">地址不是 https</string>
+    <string name="set_ocr_note">云端识字会把截图上传到你填的服务地址，别把敏感界面拿去识字。</string>
+
+    <!-- 开关的两态文案 -->
+    <string name="set_switch_on">已开启</string>
+    <string name="set_switch_off">已关闭</string>
+
+    <!-- 插件仓库 -->
+    <string name="set_plugins_current_label">当前仓库</string>
+    <string name="set_plugins_repo_label">插件仓库</string>
+    <string name="set_plugins_repo_hint">owner/repo@branch</string>
+    <string name="set_plugins_repo_save">保存</string>
+    <string name="set_plugins_repo_format_error">格式应为 owner/repo@branch</string>
+    <string name="set_plugins_repo_saved">已保存：%1$s</string>
+    <string name="set_plugins_unofficial_title">这不是官方仓库</string>
+    <string name="set_plugins_unofficial_body">这不是官方仓库，插件未经验证。</string>
+    <string name="set_plugins_unofficial_confirm">仍然使用</string>
+    <string name="set_plugins_unsigned_label">允许安装未签名插件</string>
+    <string name="set_plugins_unsigned_note">只做 SHA-256 校验，签名校验不可用。</string>
+    <string name="set_plugins_official_note">官方仓库是 %1$s，换成别的地址就是装别人发布的内容。</string>
+
+    <!-- 插件仓库镜像：国内直连 raw.githubusercontent.com 经常不通，换镜像是最要紧的一步 -->
+    <string name="set_plugins_mirror_label">当前镜像</string>
+    <string name="set_plugins_mirror_direct">官方直连</string>
+    <string name="set_plugins_mirror_jsdelivr">jsDelivr 镜像</string>
+    <string name="set_plugins_mirror_custom">自定义</string>
+    <string name="set_plugins_mirror_custom_detail">%1$s（%2$s）</string>
+    <string name="set_plugins_mirror_template_label">自定义镜像地址</string>
+    <string name="set_plugins_mirror_template_hint">https://cdn.jsdelivr.net/gh/{owner}/{repo}@{branch}</string>
+    <string name="set_plugins_mirror_save">保存镜像</string>
+    <string name="set_plugins_mirror_preview">预览地址</string>
+    <string name="set_plugins_mirror_preview_value">index.json 地址：%1$s</string>
+    <string name="set_plugins_mirror_saved">已切换为 %1$s，正在重新同步</string>
+    <string name="set_plugins_mirror_unchanged">当前已经是这个镜像，没有变化。</string>
+    <string name="set_plugins_mirror_custom_tip">填好模板再点「保存镜像」，保存后才会生效。</string>
+    <string name="set_plugins_mirror_host_error">这个模板里解析不出主机名，换一个试试。</string>
+    <string name="set_plugins_mirror_note">官方直连在国内经常连不上，换 jsDelivr 镜像通常能通；自定义镜像只允许 https，模板必须含 {owner} {repo} {branch} 三个占位符。镜像只是换一台主机取同样的文件，改不了仓库里的内容。</string>
+
+    <!-- 时间校准 -->
+    <string name="set_timing_offset_label">时间偏移</string>
+    <string name="set_timing_offset_value">%1$s ms</string>
+    <string name="set_timing_calibrated_label">上次校准</string>
+    <string name="set_timing_never">从未校准</string>
+    <string name="set_timing_calibrate">用北京时间校准</string>
+    <string name="set_timing_calibrating">正在校准，稍等…</string>
+    <string name="set_timing_calibrated_ok">校准完成，偏移 %1$s ms</string>
+    <string name="set_timing_calibrated_failed">校准失败：网络不通，过一会儿再试</string>
+    <string name="set_timing_note">校准后用北京时间做时间判断，跟手机时区无关。</string>
+
+    <!-- 运行日志 -->
+    <string name="set_logs_count_label">内存日志</string>
+    <string name="set_logs_count_value">%1$d 条</string>
+    <string name="set_logs_count_failed">条数读不出来</string>
+    <string name="set_logs_clear">清空内存日志</string>
+    <string name="set_logs_clear_done">内存日志已清空，磁盘上的日志文件没动</string>
+    <string name="set_logs_clear_failed">清空没成功，原因写进运行日志了</string>
+    <string name="set_logs_dir_action">打开日志目录说明</string>
+    <string name="set_logs_dir_dialog_title">日志目录</string>
+    <string name="set_logs_dir_dialog_body">日志按天写成 run-日期.log，放在这个目录里：\n%1$s\n\n只保留最近 7 天；「清空内存日志」不会删磁盘上的文件。</string>
+
+    <!-- 版本 -->
+    <string name="set_version_line">v%1$s · versionCode %2$d</string>
+</resources>

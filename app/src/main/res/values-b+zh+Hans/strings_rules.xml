@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  规则与步骤（// RULES / // STEPS）自己的文案：前缀统一 rules_，避免和别的模块撞名。
+
+  中文文案（与 values/strings_rules.xml 一一对应）。
+  中文里的引号一律用「」，不用英文引号。
+  文案规则：按钮写动作；红色只给删除；黄色只给「当前 / 可操作 / 要看一眼」，且只做块不做文字色。
+-->
+<resources>
+
+    <!-- 页面骨架 -->
+    <string name="rules_eyebrow_rules">// RULES</string>
+    <string name="rules_eyebrow_steps">// STEPS</string>
+    <string name="rules_title_rules">规则</string>
+    <string name="rules_back_to_rules">返回规则</string>
+
+    <!-- 动作 -->
+    <string name="rules_action_new">新建</string>
+    <string name="rules_action_add_step">加一步</string>
+    <string name="rules_action_set_current">设为当前</string>
+    <string name="rules_action_rename">重命名</string>
+    <string name="rules_action_copy">复制</string>
+    <string name="rules_action_delete">删除</string>
+    <string name="rules_action_close">关闭</string>
+    <string name="rules_action_more">更多操作</string>
+    <string name="rules_action_enable">启用</string>
+    <string name="rules_action_disable">停用</string>
+    <string name="rules_action_move_up">上移</string>
+    <string name="rules_action_move_down">下移</string>
+    <string name="rules_action_run">试跑</string>
+    <string name="rules_action_restore">恢复</string>
+    <string name="rules_action_purge">彻底删除</string>
+    <string name="rules_dialog_cancel">取消</string>
+    <string name="rules_dialog_ok">确定</string>
+
+    <!-- 行内读数 -->
+    <string name="rules_mark_current">当前</string>
+    <string name="rules_row_index">No.%1$02d</string>
+    <string name="rules_meta_steps_loop">%1$d 步 · %2$d 轮</string>
+    <string name="rules_meta_steps_infinite">%1$d 步 · 无限轮</string>
+    <string name="rules_meta_steps_only">%1$d 步</string>
+    <string name="rules_state_on">启用</string>
+    <string name="rules_state_off">停用</string>
+    <string name="rules_type_core">点击</string>
+    <string name="rules_missing_plugin">缺插件</string>
+    <string name="rules_pick_plugin">%1$s · %2$s</string>
+
+    <!-- 空状态 -->
+    <string name="rules_empty">还没有规则。点右上角「新建」开始。</string>
+    <string name="rules_steps_empty">这条规则还没有步骤。点右上角「加一步」开始。</string>
+
+    <!-- 规则的新建 / 重命名 / 复制 / 删除 -->
+    <string name="rules_dialog_new_title">新建规则</string>
+    <string name="rules_dialog_rename_title">重命名规则</string>
+    <string name="rules_dialog_name_hint">规则名</string>
+    <string name="rules_need_name">规则名不能为空。</string>
+    <string name="rules_default_new_name">新规则</string>
+    <string name="rules_dialog_delete_title">删除「%1$s」</string>
+    <string name="rules_dialog_delete_body">规则会先进回收站，最多保留最近 30 条。</string>
+    <string name="rules_created">已新建规则「%1$s」。</string>
+    <string name="rules_renamed">已重命名。</string>
+    <string name="rules_copied">已复制为「%1$s」。</string>
+    <string name="rules_copy_suffix">副本</string>
+    <string name="rules_deleted">已删除，可在回收站恢复。</string>
+    <string name="rules_delete_failed">删除失败，请稍后再试。</string>
+    <string name="rules_set_current">已设为当前规则。</string>
+    <string name="rules_save_failed">保存失败，请稍后再试。</string>
+
+    <!-- 回收站 -->
+    <string name="rules_trash_entry">回收站 %1$d 条 · 最多保留 %2$d 条</string>
+    <string name="rules_trash_title">回收站（%1$d 条，最多保留 %2$d 条）</string>
+    <string name="rules_trash_empty">回收站是空的。</string>
+    <string name="rules_trash_deleted_at">删除于 %1$s</string>
+    <string name="rules_trash_restored">已恢复「%1$s」。</string>
+    <string name="rules_trash_restore_failed">恢复失败，请稍后再试。</string>
+    <string name="rules_trash_purged">已彻底删除，无法再恢复。</string>
+    <string name="rules_trash_purge_failed">彻底删除失败，请稍后再试。</string>
+    <string name="rules_trash_purge_title">彻底删除「%1$s」</string>
+    <string name="rules_trash_purge_body">彻底删除之后不能再恢复。确定吗？</string>
+
+    <!-- 加一步 / 编辑一步 -->
+    <string name="rules_pick_step_title">加一步</string>
+    <string name="rules_pick_core">基础点击</string>
+    <string name="rules_core_new_title">新建点击步骤</string>
+    <string name="rules_core_edit_title">修改点击步骤</string>
+    <string name="rules_core_x">X 坐标</string>
+    <string name="rules_core_y">Y 坐标</string>
+    <string name="rules_core_duration">按住时长（毫秒）</string>
+    <string name="rules_core_duration_hint">10 到 2000，默认 50</string>
+    <string name="rules_core_invalid">请填 0 或更大的整数。</string>
+    <string name="rules_core_duration_invalid">按住时长要在 10 到 2000 毫秒之间。</string>
+    <string name="rules_edit_plugin_missing">这个步骤的插件没装载，暂时不能编辑。</string>
+    <string name="rules_edit_step_failed">打不开步骤编辑器。</string>
+    <string name="rules_step_updated">步骤已更新。</string>
+    <string name="rules_step_deleted">已删除这一步。</string>
+    <string name="rules_step_delete_title">删除第 %1$d 步</string>
+    <string name="rules_step_delete_body">删除后这一步不会再执行。确定吗？</string>
+
+    <!-- 试跑 -->
+    <string name="rules_run_need_channel">先打开无障碍服务或 Shizuku。</string>
+    <string name="rules_run_success">第 %1$d 步执行成功。</string>
+    <string name="rules_run_failed">第 %1$d 步失败：%2$s</string>
+    <string name="rules_run_timeout">注入通道 5 秒没有回应。</string>
+    <string name="rules_run_channel_refused">注入通道拒绝了这次点击。</string>
+    <string name="rules_run_plugin_missing">这个步骤的插件没装载。</string>
+    <string name="rules_run_stop">插件请求停止。</string>
+    <string name="rules_run_pause">插件请求暂停。</string>
+    <string name="rules_step_run_label">第 %1$d 步</string>
+</resources>

@@ -9,13 +9,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.SystemClock
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -28,7 +31,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
+import com.example.autotapper.engine.RegionStore
+import com.example.autotapper.model.Region
+import com.example.autotapper.model.TapCoord
+import com.example.autotapper.plugin.RecordedGesture
+import com.example.autotapper.plugin.host.RecordedGestureJson
+import java.util.UUID
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * 悬浮控制台：一条贴边窄竖条 + 收起后的小标签 + 可展开的读数面板。
@@ -53,6 +65,36 @@ class OverlayService : Service() {
 
     private var pickerRoot: View? = null
     private var pickerCounterView: TextView? = null
+
+    // 画区域模式：和打点遮罩分开建窗，互不抢占监听器；同一时刻只服务一个请求
+    private var regionRoot: View? = null
+    private var regionBox: View? = null
+    private var regionSizeView: TextView? = null
+    private var regionStartX = 0
+    private var regionStartY = 0
+    private var regionDragging = false
+    private var regionRequestId: String? = null
+    private var regionLabel: String = ""
+
+    // 录制模式：状态全在服务里（插件那边只是在等一个广播，随时可能取消），
+    // 窗口和已录手势都不挂在请求方身上，服务被系统重拉也不会把半截状态留在插件里
+    private var recordRoot: View? = null
+    private var recordStatusView: TextView? = null
+    private var recordRequestId: String? = null
+    private val recordedGestures = mutableListOf<RecordedGesture>()
+    private var recordEndAt = 0L
+    private var recordDownX = 0f
+    private var recordDownY = 0f
+    private var recordDownAt = 0L
+    private var recordTracking = false
+
+    /** 到时长上限自动收摊，别让遮层一直占着触摸（用户还以为在录）。 */
+    private val recordDeadlineRunnable = Runnable {
+        if (recordRoot != null) {
+            LogBus.info("录制到达时长上限，自动结束")
+            finishRecording(sendResult = true)
+        }
+    }
 
     private val pointMarkers = mutableListOf<TextView>()
     private val markerBlinkers = mutableMapOf<View, Runnable>()
@@ -187,6 +229,19 @@ class OverlayService : Service() {
                 }
 
                 AutoTapperConfig.ACTION_CONTROLLER_ALPHA_CHANGED -> refreshControllerAlpha()
+                AutoTapperConfig.ACTION_CANCEL_REGION_PICK -> {
+                    if (intent.getStringExtra(AutoTapperConfig.EXTRA_PICK_REQUEST_ID) == regionRequestId) {
+                        cancelRegionPick(sendResult = false)
+                    }
+                }
+
+                AutoTapperConfig.ACTION_STOP_RECORDING -> {
+                    // 只认自己那一单：并发请求可能互相踩，requestId 对不上就别乱关别人的遮层
+                    val recordId = intent.getStringExtra(AutoTapperConfig.EXTRA_RECORD_REQUEST_ID)
+                    if (recordRoot != null && recordId == recordRequestId) {
+                        cancelRecording()
+                    }
+                }
             }
         }
     }
@@ -220,6 +275,28 @@ class OverlayService : Service() {
                 ensureViews()
                 setExpanded(true, animate = false)
                 showPickerOverlay()
+            }
+
+            AutoTapperConfig.ACTION_START_REGION_PICK -> {
+                ensureViews()
+                showRegionPick(
+                    intent.getStringExtra(AutoTapperConfig.EXTRA_PICK_REQUEST_ID).orEmpty(),
+                    intent.getStringExtra(AutoTapperConfig.EXTRA_REGION_LABEL).orEmpty()
+                )
+            }
+
+            AutoTapperConfig.ACTION_START_RECORDING -> {
+                ensureViews()
+                startRecording(
+                    intent.getStringExtra(AutoTapperConfig.EXTRA_RECORD_REQUEST_ID).orEmpty(),
+                    intent.getLongExtra(AutoTapperConfig.EXTRA_RECORD_MAX_MS, DEFAULT_RECORD_MAX_MS)
+                )
+            }
+
+            // 请求方已经放弃（插件协程被取消 / 超时）：只收窗口，不再回传结果，那边没人接了
+            AutoTapperConfig.ACTION_STOP_RECORDING -> {
+                cancelRecording()
+                return START_STICKY
             }
 
             AutoTapperConfig.ACTION_SHOW_CONTROLLER -> {
@@ -266,6 +343,8 @@ class OverlayService : Service() {
     override fun onDestroy() {
         stopClickingIfNeeded()
         dismissPickerOverlay()
+        cancelRegionPick(sendResult = false)
+        cancelRecording()
         hideMarkers()
         handler.removeCallbacksAndMessages(null)
         railView?.let { removeViewSafely(it) }
@@ -328,15 +407,35 @@ class OverlayService : Service() {
     }
 
     /** 深浅色切换后重建：颜色在创建时解析，需要重新生成一次视图。 */
+    /** 旋转后重建控制器时，画区域窗口也要跟着重画（现有请求继续保留）。 */
+    private fun rebuildRegionPickIfNeeded(wasActive: Boolean, requestId: String?, label: String) {
+        if (wasActive) {
+            showRegionPick(requestId.orEmpty(), label)
+        }
+    }
+
     private fun rebuildConsole() {
         val wasExpanded = expanded
         val wasInfo = infoVisible
         val hadPicker = pickerRoot != null
+        val hadRegionPick = regionRoot != null
+        val regionPickRequestId = regionRequestId
+        val regionPickLabel = regionLabel
         val startCount = sessionStartCount
+        val hadRecording = recordRoot != null
 
         hideMarkers()
         if (hadPicker) {
             dismissPickerOverlay()
+        }
+        if (hadRegionPick) {
+            dismissRegionOverlay()
+        }
+        if (hadRecording) {
+            // 重建后控制器窗口会被重新加到最上层，遮层就压不住了；已录内容也不能悄悄丢，
+            // 所以这里提前结束录制，把录到的手势照常回传给请求方
+            LogBus.info("窗口重建（旋转或深浅色切换），录制提前结束")
+            finishRecording(sendResult = true)
         }
         val removed = listOfNotNull(railView, tabView, infoView).map { removeViewSafely(it) }
         railView = null
@@ -361,6 +460,7 @@ class OverlayService : Service() {
             // 否则「取消取点」回滚不掉重建之前那次会话新增的点位
             sessionStartCount = startCount
         }
+        rebuildRegionPickIfNeeded(hadRegionPick, regionPickRequestId, regionPickLabel)
     }
 
     private fun renderConsole() {
@@ -879,10 +979,524 @@ class OverlayService : Service() {
             gravity = Gravity.TOP or Gravity.LEFT
         }
 
+    /** 画区域窗口要收 BACK 按键，所以不能带 FLAG_NOT_FOCUSABLE；只在画区域期间短暂聚焦。 */
+    private fun regionFullscreenParams() =
+        WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            overlayWindowType(),
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            gravity = Gravity.TOP or Gravity.LEFT
+        }
+
     // ------------------------------------------------------------ 杂项
 
     private fun toast(resId: Int) {
         Toast.makeText(this, resId, Toast.LENGTH_SHORT).show()
+    }
+
+    // ------------------------------------------------------------ 画区域（插件 RegionApi.pick）
+
+    /**
+     * 悬浮层进入矩形框选：按下起点、拖出矩形、松手保存并广播结果。
+     * 点「取消」或按 BACK 放弃；结果通过广播回传给请求方。
+     */
+    private fun showRegionPick(requestId: String, label: String) {
+        if (regionRoot != null) {
+            cancelRegionPick(sendResult = true)
+        }
+        if (!PermissionUtils.isOverlayPermissionGranted(this)) {
+            toast(R.string.region_pick_permission_required)
+            return
+        }
+
+        val themedContext = android.view.ContextThemeWrapper(this, R.style.ThemeOverlay_AutoTapper_Floating)
+        val root = FrameLayout(themedContext)
+        root.layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        )
+        val scrim = View(themedContext).apply {
+            setBackgroundColor(Ef.color(this@OverlayService, R.color.ef_scrim))
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        }
+        root.addView(scrim)
+
+        val box = View(themedContext).apply {
+            background = GradientDrawable().apply {
+                setColor(Color.TRANSPARENT)
+                setStroke(Ef.dp(this@OverlayService, 2), Ef.color(this@OverlayService, R.color.ef_signal))
+            }
+            visibility = View.GONE
+            layoutParams = FrameLayout.LayoutParams(0, 0)
+        }
+        root.addView(box)
+
+        val sizeView = TextView(themedContext).apply {
+            text = getString(R.string.region_pick_size, 0, 0)
+            setTextColor(Ef.color(this@OverlayService, R.color.ef_ink))
+            textSize = 13f
+            setBackgroundColor(Ef.color(this@OverlayService, R.color.ef_panel))
+            visibility = View.GONE
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            ).apply { gravity = Gravity.TOP or Gravity.START }
+        }
+        root.addView(sizeView)
+
+        val card = LinearLayout(themedContext).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundResource(R.drawable.ef_panel_board)
+            isClickable = true
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            ).apply { gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL; topMargin = Ef.dp(this@OverlayService, 64) }
+        }
+        card.addView(TextView(themedContext).apply {
+            text = getString(R.string.region_pick_title)
+            setTextColor(Ef.color(this@OverlayService, R.color.ef_ink))
+            textSize = 18f
+        })
+        card.addView(TextView(themedContext).apply {
+            text = getString(R.string.region_pick_hint)
+            setTextColor(Ef.color(this@OverlayService, R.color.ef_ink))
+            textSize = 13f
+            maxWidth = Ef.dp(this@OverlayService, 248)
+        })
+        card.addView(TextView(themedContext).apply {
+            text = if (label.isBlank()) getString(R.string.region_pick_title) else label
+            setTextColor(Ef.color(this@OverlayService, R.color.ef_ink))
+            textSize = 13f
+            maxWidth = Ef.dp(this@OverlayService, 248)
+        })
+        val cancelButton = TextView(themedContext).apply {
+            text = getString(R.string.cancel_capture)
+            setTextColor(Ef.color(this@OverlayService, R.color.ef_ink))
+            textSize = 15f
+            setBackgroundResource(R.drawable.ef_panel_board)
+            setPadding(Ef.dp(this@OverlayService, 14), Ef.dp(this@OverlayService, 8),
+                Ef.dp(this@OverlayService, 14), Ef.dp(this@OverlayService, 8))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = Ef.dp(this@OverlayService, 12) }
+            setOnClickListener { cancelRegionPick(sendResult = true) }
+        }
+        card.addView(cancelButton)
+        root.addView(card)
+
+        if (!runCatching { windowManager.addView(root, regionFullscreenParams()) }.isSuccess) {
+            toast(R.string.region_pick_permission_required)
+            return
+        }
+
+        regionRoot = root
+        regionBox = box
+        regionSizeView = sizeView
+        regionRequestId = requestId
+        regionLabel = label
+        regionDragging = false
+        scrim.setOnTouchListener { _, event -> handleRegionTouch(event) }
+        root.isFocusableInTouchMode = true
+        root.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                cancelRegionPick(sendResult = true)
+                true
+            } else {
+                false
+            }
+        }
+        runCatching { root.requestFocus() }
+
+        railView?.animate()?.cancel()
+        railView?.alpha = 0f
+        railView?.let { setTouchable(it, false) }
+        hideMarkers()
+    }
+
+    private fun handleRegionTouch(event: MotionEvent): Boolean {
+        val x = event.rawX.toInt()
+        val y = event.rawY.toInt()
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                regionStartX = x
+                regionStartY = y
+                regionDragging = true
+                regionBox?.visibility = View.VISIBLE
+                regionSizeView?.visibility = View.VISIBLE
+                updateRegionPreview(0, 0)
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (regionDragging) {
+                    updateRegionPreview(abs(x - regionStartX), abs(y - regionStartY))
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+                if (!regionDragging) return true
+                regionDragging = false
+                val left = min(regionStartX, x)
+                val top = min(regionStartY, y)
+                val width = abs(x - regionStartX)
+                val height = abs(y - regionStartY)
+                if (width < 2 || height < 2) {
+                    cancelRegionPick(sendResult = true)
+                    return true
+                }
+                completeRegionPick(left, top, width, height)
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                if (regionDragging) {
+                    regionDragging = false
+                    cancelRegionPick(sendResult = true)
+                }
+            }
+        }
+        return true
+    }
+
+    private fun updateRegionPreview(width: Int, height: Int) {
+        val box = regionBox ?: return
+        val lw = box.layoutParams as FrameLayout.LayoutParams
+        lw.width = max(width, 2)
+        lw.height = max(height, 2)
+        lw.leftMargin = min(regionStartX, regionStartX + width)
+        lw.topMargin = min(regionStartY, regionStartY + height)
+        runCatching { box.layoutParams = lw }
+        regionSizeView?.text = getString(R.string.region_pick_size, width, height)
+        val sw = regionSizeView?.layoutParams as? FrameLayout.LayoutParams
+        if (sw != null) {
+            sw.leftMargin = min(regionStartX, regionStartX + width)
+                .coerceIn(0, (screenWidth - Ef.dp(this, 160)).coerceAtLeast(0))
+            val top = min(regionStartY, regionStartY + height) - Ef.dp(this, 32)
+            sw.topMargin = top.coerceIn(0, (screenHeight - Ef.dp(this, 48)).coerceAtLeast(0))
+            runCatching { regionSizeView?.layoutParams = sw }
+        }
+    }
+
+    private fun completeRegionPick(x: Int, y: Int, width: Int, height: Int) {
+        val currentId = regionRequestId ?: return
+        val id = if (currentId.isBlank()) UUID.randomUUID().toString() else currentId
+        val newRegion = Region(
+            id = id,
+            label = regionLabel.ifBlank { RegionStore.labelFor(RegionStore.load(this).size) },
+            x = x,
+            y = y,
+            w = width,
+            h = height
+        )
+        runCatching { RegionStore.save(this, RegionStore.load(this) + newRegion) }
+            .onFailure { LogBus.warn("画区域结果落盘失败：" + it) }
+        dismissRegionOverlay()
+        runCatching {
+            sendBroadcast(
+                Intent(AutoTapperConfig.ACTION_REGION_PICKED)
+                    .setPackage(packageName)
+                    .putExtra(AutoTapperConfig.EXTRA_PICK_REQUEST_ID, id)
+                    .putExtra(AutoTapperConfig.EXTRA_REGION_LABEL, newRegion.label)
+                    .putExtra(AutoTapperConfig.EXTRA_REGION_X, x)
+                    .putExtra(AutoTapperConfig.EXTRA_REGION_Y, y)
+                    .putExtra(AutoTapperConfig.EXTRA_REGION_W, width)
+                    .putExtra(AutoTapperConfig.EXTRA_REGION_H, height)
+            )
+        }
+        Toast.makeText(this, getString(R.string.region_pick_saved_toast, newRegion.label), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun cancelRegionPick(sendResult: Boolean) {
+        if (regionRoot == null) return
+        val id = regionRequestId
+        dismissRegionOverlay()
+        if (sendResult && id != null) {
+            runCatching {
+                sendBroadcast(
+                    Intent(AutoTapperConfig.ACTION_CANCEL_REGION_PICK)
+                        .setPackage(packageName)
+                        .putExtra(AutoTapperConfig.EXTRA_PICK_REQUEST_ID, id)
+                )
+            }
+            Toast.makeText(this, R.string.region_pick_cancelled_toast, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun dismissRegionOverlay() {
+        regionRoot?.let { runCatching { windowManager.removeView(it) } }
+        regionRoot = null
+        regionBox = null
+        regionSizeView = null
+        regionRequestId = null
+        regionLabel = ""
+        regionDragging = false
+        if (expanded) {
+            applyAlpha(animate = true)
+            railView?.let { setTouchable(it, true) }
+            refreshMarkers()
+        }
+    }
+
+
+    // ------------------------------------------------------------ 录制（插件 RecordApi.record）
+
+    /**
+     * 进入录制模式：一块全屏透明遮层 + 顶部一条墨底小条（「录制中 · 已 N 条」+「结束」）。
+     *
+     * 诚实边界：遮层必须拿到触摸才能记坐标，所以录制期间下层应用收不到这一次点击——
+     * 录到的是"你点的位置"，不是"应用对这次点击的反应"。插件那边也据此写日志。
+     */
+    private fun startRecording(requestId: String, maxDurationMs: Long) {
+        if (recordRoot != null) {
+            // 同一时刻只服务一个录制请求：上一个请求方已经拿到结果或者已经超时放过手了
+            finishRecording(sendResult = true)
+        }
+        if (!PermissionUtils.isOverlayPermissionGranted(this)) {
+            toast(R.string.overlay_permission_required)
+            // 别让插件干等到超时：立刻回一张空表，插件会提示"没有录到任何操作"
+            sendRecorded(requestId, emptyList())
+            return
+        }
+
+        recordRequestId = requestId
+        recordedGestures.clear()
+        recordDownX = 0f
+        recordDownY = 0f
+        recordTracking = false
+        // 上限夹一刀：插件可能传 0 或离谱的大数，遮层不能因此赖着不走
+        val duration = maxDurationMs.coerceIn(MIN_RECORD_MS, MAX_RECORD_MS)
+        recordEndAt = SystemClock.uptimeMillis() + duration
+
+        if (!attachRecordingWindow()) {
+            recordRequestId = null
+            toast(R.string.overlay_permission_required)
+            sendRecorded(requestId, emptyList())
+            return
+        }
+        scheduleRecordDeadline()
+
+        // 遮层要独占触摸，控制器整个先隐身（窄条、收起标签、读数板都是）；
+        // 录完 / 取消后由 restoreConsoleAfterRecording 按当前收起/展开状态还原
+        railView?.animate()?.cancel()
+        tabView?.animate()?.cancel()
+        infoView?.animate()?.cancel()
+        railView?.alpha = 0f
+        tabView?.alpha = 0f
+        infoView?.alpha = 0f
+        railView?.let { setTouchable(it, false) }
+        tabView?.let { setTouchable(it, false) }
+        hideMarkers()
+
+        LogBus.info("开始录制操作，最长 " + (duration / 1000L) + " 秒")
+        Toast.makeText(this, "录制中：点屏幕记位置，点顶部「结束」交回", Toast.LENGTH_SHORT).show()
+    }
+
+    /** 建录制窗口。返回 false 表示加窗失败（权限被撤销等），调用方要回一张空表。 */
+    private fun attachRecordingWindow(): Boolean {
+        if (recordRoot != null) {
+            return true
+        }
+
+        val themedContext = android.view.ContextThemeWrapper(this, R.style.ThemeOverlay_AutoTapper_Floating)
+        val root = FrameLayout(themedContext)
+        root.layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        )
+        // 遮层本身全透明：用户得看清下面在点什么；只有顶部那条小条是不透明的墨色
+        root.setBackgroundColor(Color.TRANSPARENT)
+
+        val bar = LinearLayout(themedContext).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setBackgroundColor(Ef.color(this@OverlayService, R.color.ef_ink))
+            setPadding(
+                Ef.dp(this@OverlayService, 12),
+                Ef.dp(this@OverlayService, 8),
+                Ef.dp(this@OverlayService, 8),
+                Ef.dp(this@OverlayService, 8)
+            )
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                topMargin = Ef.dp(this@OverlayService, 64)
+            }
+            // 小条要自己吃掉落在它身上的触摸，否则点「结束」会被当成一次手势记下来
+            setOnTouchListener { _, _ -> true }
+        }
+
+        val status = TextView(themedContext).apply {
+            text = recordStatusText()
+            setTextColor(Ef.color(this@OverlayService, R.color.ef_panel))
+            textSize = 13f
+            includeFontPadding = false
+        }
+        bar.addView(status)
+
+        val stopView = TextView(themedContext).apply {
+            text = "结束"
+            setTextColor(Ef.color(this@OverlayService, R.color.ef_ink))
+            textSize = 13f
+            setBackgroundColor(Ef.color(this@OverlayService, R.color.ef_signal))
+            setPadding(
+                Ef.dp(this@OverlayService, 12),
+                Ef.dp(this@OverlayService, 6),
+                Ef.dp(this@OverlayService, 12),
+                Ef.dp(this@OverlayService, 6)
+            )
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { leftMargin = Ef.dp(this@OverlayService, 12) }
+            setOnClickListener { finishRecording(sendResult = true) }
+        }
+        bar.addView(stopView)
+        root.addView(bar)
+        root.setOnTouchListener { _, event -> handleRecordTouch(event) }
+
+        if (!runCatching { windowManager.addView(root, fullscreenParams()) }.isSuccess) {
+            return false
+        }
+        recordRoot = root
+        recordStatusView = status
+        return true
+    }
+
+    private fun scheduleRecordDeadline() {
+        handler.removeCallbacks(recordDeadlineRunnable)
+        val remaining = (recordEndAt - SystemClock.uptimeMillis()).coerceAtLeast(1L)
+        handler.postDelayed(recordDeadlineRunnable, remaining)
+    }
+
+    private fun handleRecordTouch(event: MotionEvent): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                recordDownX = event.rawX
+                recordDownY = event.rawY
+                recordDownAt = event.downTime
+                recordTracking = true
+            }
+
+            MotionEvent.ACTION_UP -> {
+                if (recordTracking) {
+                    recordTracking = false
+                    appendRecordedGesture(
+                        event.rawX,
+                        event.rawY,
+                        (event.eventTime - recordDownAt).coerceAtLeast(0L)
+                    )
+                }
+            }
+
+            MotionEvent.ACTION_CANCEL -> recordTracking = false
+        }
+        // 全程吃掉：录制期间这一下不给下层应用，避免"录到了但应用也响应了"这种双份动作
+        return true
+    }
+
+    /** 按时间差与位移判定：按下到抬起 < 300 ms 且移动 < 24 dp 算点击，其余算滑动。 */
+    private fun appendRecordedGesture(upX: Float, upY: Float, durationMs: Long) {
+        val slop = Ef.dp(this, RECORD_TOUCH_SLOP_DP)
+        val dx = abs(upX - recordDownX)
+        val dy = abs(upY - recordDownY)
+        val from = TapCoord(recordDownX.toInt(), recordDownY.toInt())
+        val gesture = if (durationMs < RECORD_TAP_MAX_MS && dx < slop && dy < slop) {
+            RecordedGesture(
+                kind = RecordedGesture.Kind.TAP,
+                from = from,
+                to = from,
+                durationMs = durationMs,
+                holdMs = durationMs
+            )
+        } else {
+            RecordedGesture(
+                kind = RecordedGesture.Kind.SWIPE,
+                from = from,
+                to = TapCoord(upX.toInt(), upY.toInt()),
+                durationMs = durationMs,
+                holdMs = 0L
+            )
+        }
+        recordedGestures.add(gesture)
+        recordStatusView?.text = recordStatusText()
+
+        val isSwipe = gesture.kind == RecordedGesture.Kind.SWIPE
+        LogBus.info(
+            "录到第 " + recordedGestures.size + " 条：" + (if (isSwipe) "滑动 " else "点击 ") +
+                from.x + "," + from.y +
+                (if (isSwipe) " → " + gesture.to.x + "," + gesture.to.y else "") +
+                "（" + durationMs + " ms）"
+        )
+    }
+
+    private fun recordStatusText(): String = "录制中 · 已 " + recordedGestures.size + " 条"
+
+    /**
+     * 收掉录制窗口。sendResult = true 时把已录内容广播回给请求方（用户点「结束」/ 到时长上限）；
+     * false 用于请求方自己取消（插件协程被取消、服务即将销毁），此时那边没人接这个广播。
+     */
+    private fun finishRecording(sendResult: Boolean) {
+        if (recordRoot == null) {
+            return
+        }
+        val requestId = recordRequestId.orEmpty()
+        val gestures = recordedGestures.toList()
+        detachRecordingWindow()
+        recordRequestId = null
+        recordedGestures.clear()
+        if (sendResult) {
+            sendRecorded(requestId, gestures)
+            Toast.makeText(this, "录制结束，共 " + gestures.size + " 条", Toast.LENGTH_SHORT).show()
+            LogBus.info("录制结束，共 " + gestures.size + " 条手势")
+        }
+        restoreConsoleAfterRecording()
+    }
+
+    private fun cancelRecording() {
+        if (recordRoot == null) {
+            return
+        }
+        LogBus.info("录制被取消，已录到的 " + recordedGestures.size + " 条不回传")
+        finishRecording(sendResult = false)
+    }
+
+    private fun detachRecordingWindow() {
+        handler.removeCallbacks(recordDeadlineRunnable)
+        recordRoot?.let { removeViewSafely(it) }
+        recordRoot = null
+        recordStatusView = null
+        recordTracking = false
+    }
+
+    /** 录制期间把控制器整个藏起来了，这里按当前收起/展开状态还原，别让它一直隐身。 */
+    private fun restoreConsoleAfterRecording() {
+        if (railView == null || tabView == null) {
+            return
+        }
+        applyAlpha(animate = true)
+        // 触摸开关跟 setExpanded 保持一致：展开时窄条可点、收起时小标签可点
+        railView?.let { setTouchable(it, expanded) }
+        tabView?.let { setTouchable(it, !expanded) }
+        refreshMarkers()
+    }
+
+    private fun sendRecorded(requestId: String, gestures: List<RecordedGesture>) {
+        runCatching {
+            sendBroadcast(
+                Intent(AutoTapperConfig.ACTION_RECORDED)
+                    .setPackage(packageName)
+                    .putExtra(AutoTapperConfig.EXTRA_RECORD_REQUEST_ID, requestId)
+                    .putExtra(
+                        AutoTapperConfig.EXTRA_RECORDED_JSON,
+                        RecordedGestureJson.encode(gestures)
+                    )
+            )
+        }.onFailure { LogBus.warn("回传录制结果失败：" + it.javaClass.simpleName) }
     }
 
     /** @return 窗口确实被摘掉了（已经是 null 视为成功），失败时调用方要处理，否则会留下孤儿窗口。 */
@@ -904,6 +1518,8 @@ class OverlayService : Service() {
             addAction(AutoTapperConfig.ACTION_CLICK_STATE_CHANGED)
             addAction(AutoTapperConfig.ACTION_POINT_SELECTED)
             addAction(AutoTapperConfig.ACTION_CONTROLLER_ALPHA_CHANGED)
+            addAction(AutoTapperConfig.ACTION_CANCEL_REGION_PICK)
+            addAction(AutoTapperConfig.ACTION_STOP_RECORDING)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(serviceReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
@@ -1013,5 +1629,13 @@ class OverlayService : Service() {
 
         private const val MARKER_WINDOW_ALPHA = 0.95f
         private const val BLINK_INTERVAL_MS = 620L
+
+        private const val DEFAULT_RECORD_MAX_MS = 120_000L
+        private const val MIN_RECORD_MS = 1_000L
+        private const val MAX_RECORD_MS = 300_000L
+
+        /** 按下到抬起短于这个时长、且位移小于 24dp，算一次点击而不是滑动。 */
+        private const val RECORD_TAP_MAX_MS = 300L
+        private const val RECORD_TOUCH_SLOP_DP = 24
     }
 }

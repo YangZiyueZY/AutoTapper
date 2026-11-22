@@ -1,0 +1,20 @@
+# 统一换行：CI 在 Linux 上跑，脚本与配置一律 LF
+* text=auto eol=lf
+
+# 二进制资源不要动（截图、图标、字体、矢量图之外的二进制）
+*.png   binary
+*.webp  binary
+*.jpg   binary
+*.ttf   binary
+*.otf   binary
+*.jar   binary
+
+# 这些必须保持 LF
+*.sh     text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.gradle text eol=lf
+*.kt     text eol=lf
+*.xml    text eol=lf
+*.md     text eol=lf
+*.json   text eol=lf

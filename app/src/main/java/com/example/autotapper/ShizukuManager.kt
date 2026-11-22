@@ -198,4 +198,36 @@ object ShizukuManager {
             .onFailure { Log.w(TAG, "tap failed", it) }
             .getOrDefault(false)
     }
+
+    /** 滑动；UserService 里做插值，总时长由调用方给。 */
+    fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, durationMs: Long): Boolean {
+        val service = tapService ?: return false
+        return runCatching { service.swipe(x1, y1, x2, y2, durationMs.toInt()) }
+            .onFailure { Log.w(TAG, "swipe failed", it) }
+            .getOrDefault(false)
+    }
+
+    /** 多指同时按下；最多 10 指。 */
+    fun multiTouch(xs: IntArray, ys: IntArray, holdMs: Long): Boolean {
+        val service = tapService ?: return false
+        return runCatching { service.multiTouch(xs, ys, holdMs.toInt()) }
+            .onFailure { Log.w(TAG, "multiTouch failed", it) }
+            .getOrDefault(false)
+    }
+
+    /** 注入按键（3=HOME 4=BACK 82=MENU 187=APP_SWITCH）。 */
+    fun keyEvent(keyCode: Int): Boolean {
+        val service = tapService ?: return false
+        return runCatching { service.keyEvent(keyCode) }
+            .onFailure { Log.w(TAG, "keyEvent failed", it) }
+            .getOrDefault(false)
+    }
+
+    /** 输入文本；非 ASCII 由 user service 退到 input text。 */
+    fun inputText(text: String): Boolean {
+        val service = tapService ?: return false
+        return runCatching { service.inputText(text) }
+            .onFailure { Log.w(TAG, "inputText failed", it) }
+            .getOrDefault(false)
+    }
 }

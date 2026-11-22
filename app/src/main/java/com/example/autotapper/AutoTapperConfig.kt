@@ -37,18 +37,39 @@ object AutoTapperConfig {
     const val ACTION_POINT_SELECTED = "com.example.autotapper.action.POINT_SELECTED"
     const val ACTION_START_CLICKING = "com.example.autotapper.action.START_CLICKING"
     const val ACTION_STOP_CLICKING = "com.example.autotapper.action.STOP_CLICKING"
+
+    /** 暂停 / 继续：两个服务都接收，和 START / STOP 走同一条广播通道。 */
+    const val ACTION_PAUSE_CLICKING = "com.example.autotapper.action.PAUSE_CLICKING"
+    const val ACTION_RESUME_CLICKING = "com.example.autotapper.action.RESUME_CLICKING"
     const val ACTION_SHOW_CONTROLLER = "com.example.autotapper.action.SHOW_CONTROLLER"
     const val ACTION_START_PICKING = "com.example.autotapper.action.START_PICKING"
     const val ACTION_STOP_CONTROLLER = "com.example.autotapper.action.STOP_CONTROLLER"
     const val ACTION_CLICK_STATE_CHANGED = "com.example.autotapper.action.CLICK_STATE_CHANGED"
     const val ACTION_CONTROLLER_ALPHA_CHANGED = "com.example.autotapper.action.CONTROLLER_ALPHA_CHANGED"
     const val ACTION_SHIZUKU_TAP = "com.example.autotapper.action.SHIZUKU_TAP"
+    const val ACTION_START_REGION_PICK = "com.example.autotapper.action.START_REGION_PICK"
+    const val ACTION_CANCEL_REGION_PICK = "com.example.autotapper.action.CANCEL_REGION_PICK"
+    const val ACTION_REGION_PICKED = "com.example.autotapper.action.REGION_PICKED"
+
+    /** 录制模式：拉起 / 停掉遮层，结果用 ACTION_RECORDED 回传（插件 RecorderBridge 在等）。 */
+    const val ACTION_START_RECORDING = "com.example.autotapper.action.START_RECORDING"
+    const val ACTION_STOP_RECORDING = "com.example.autotapper.action.STOP_RECORDING"
+    const val ACTION_RECORDED = "com.example.autotapper.action.RECORDED"
 
     const val EXTRA_TAP_X = "extra_tap_x"
     const val EXTRA_TAP_Y = "extra_tap_y"
     const val EXTRA_IS_CLICKING = "extra_is_clicking"
     const val EXTRA_START_PICKING = "extra_start_picking"
     const val EXTRA_CURRENT_POINT_INDEX = "extra_current_point_index"
+    const val EXTRA_REGION_X = "extra_region_x"
+    const val EXTRA_REGION_Y = "extra_region_y"
+    const val EXTRA_REGION_W = "extra_region_w"
+    const val EXTRA_REGION_H = "extra_region_h"
+    const val EXTRA_REGION_LABEL = "extra_region_label"
+    const val EXTRA_PICK_REQUEST_ID = "extra_pick_request_id"
+    const val EXTRA_RECORD_REQUEST_ID = "extra_record_request_id"
+    const val EXTRA_RECORDED_JSON = "extra_recorded_json"
+    const val EXTRA_RECORD_MAX_MS = "extra_record_max_ms"
 
     // 点击方式的两种实现：无障碍手势 / Shizuku 提权
     const val TAP_MODE_ACCESSIBILITY = "accessibility"
@@ -73,6 +94,10 @@ object AutoTapperConfig {
         prefs(context).edit().putString(KEY_TAP_MODE, mode).apply()
     }
 
+    /**
+     * 点位相关方法仍然保留：主界面与悬浮控制器的取点/徽标还在用它们，
+     * 而引擎已经改吃「规则」；两边通过 RuleStore.ensureMigrated 的迁移对齐。
+     */
     fun loadPoints(context: Context): List<TapPoint> {
         val prefs = prefs(context)
         val raw = prefs.getString(KEY_TAP_POINTS, null)

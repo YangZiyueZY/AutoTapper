@@ -66,6 +66,28 @@
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.AutoTapper.Square</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.AutoTapper.Square</item>
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.AutoTapper.Square</item>
+
+        <!-- 对话框：Material3 默认 28dp 大圆角，和"圆角一律 0"冲突，这里整套压平 -->
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.AutoTapper.Dialog</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.AutoTapper.Dialog</item>
+    </style>
+
+    <!--
+      对话框主题：只做两件事——把圆角压成 0、把容器色落到 ef_panel。
+      M3 对话框的形状由 shapeAppearanceCorner* 五个档位决定，只改一个档位会剩下一圈圆角，
+      所以五个档位全部指向同一个直角形状。
+    -->
+    <style name="ThemeOverlay.AutoTapper.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/ef_panel</item>
+        <item name="colorOnSurface">@color/ef_ink</item>
+        <item name="colorPrimary">@color/ef_ink</item>
+        <item name="colorOnPrimary">@color/ef_paper</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.AutoTapper.Square</item>
+        <item name="shapeAppearanceCornerExtraSmall">@style/ShapeAppearance.AutoTapper.Square</item>
+        <item name="shapeAppearanceCornerSmall">@style/ShapeAppearance.AutoTapper.Square</item>
+        <item name="shapeAppearanceCornerMedium">@style/ShapeAppearance.AutoTapper.Square</item>
+        <item name="shapeAppearanceCornerLarge">@style/ShapeAppearance.AutoTapper.Square</item>
+        <item name="shapeAppearanceCornerExtraLarge">@style/ShapeAppearance.AutoTapper.Square</item>
     </style>
 
     <!--
