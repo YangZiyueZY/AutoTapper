@@ -75,6 +75,11 @@
 
 ## 平板适配
 
+<p align="center">
+  <img src="./assets/readme/screen-tablet-landscape.png" width="48%" alt="平板横屏：左右两栏，左侧说明与权限，右侧点位与参数">
+  <img src="./assets/readme/screen-tablet-portrait.png" width="48%" alt="平板竖屏：单列加宽居中，页边距与字号放大">
+</p>
+
 布局按 Android 窗口尺寸自动切换：**sw600dp 起算平板**，可用宽度 **≥840dp**（平板横屏、大屏）起两栏。
 
 - 手机：保持原来的单列。
