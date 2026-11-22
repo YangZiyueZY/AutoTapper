@@ -27,7 +27,7 @@
 
     <text class="ui" x="56" y="204" font-size="26" fill="#C9C9C6">在任意应用里取点，按顺序轮流点击。</text>
 
-    <text class="mono" x="56" y="248" font-size="19" fill="#A3A3A3">v1.4.0 │ Android 8.0+ │ 多点轮询 │ 无障碍 / Shizuku</text>
+    <text class="mono" x="56" y="248" font-size="19" fill="#A3A3A3">v1.3.0 │ Android 8.0+ │ 多点轮询 │ 无障碍 / Shizuku</text>
   </g>
 
   <!-- 轮询回环：三个编号点位 + 回到起点 -->
