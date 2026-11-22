@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-      大屏档（available width >= 840dp：平板横屏、桌面/大屏）：左右两栏并排，两栏间距 column_gap=40dp。
-      这份文件里 column_gap 大于 0，MainActivity 据此给右栏加 paddingStart；其余值只放大留白与字号。
+      大屏 / 平板横屏档（可用宽度 >= 840dp）：左右两栏并排。
+      与 values-w600dp 同为 w<N>dp 限定符，840 比 600 更贴近实际宽度，因此本档优先命中。
     -->
-    <dimen name="page_gutter">40dp</dimen>
+    <dimen name="page_gutter">48dp</dimen>
     <dimen name="section_gap">40dp</dimen>
     <dimen name="block_gap">24dp</dimen>
     <dimen name="block_padding">24dp</dimen>
@@ -15,8 +15,9 @@
     <dimen name="label_size">14sp</dimen>
     <dimen name="title_size">34sp</dimen>
     <dimen name="section_title_size">18sp</dimen>
-    <dimen name="column_gap">40dp</dimen>
-    <dimen name="content_max_width">1120dp</dimen>
+    <!-- 两栏之间的沟槽；每栏宽度由可用宽度与 gutter / gap 共同决定，不再额外限宽 -->
+    <dimen name="column_gap">48dp</dimen>
+    <dimen name="content_max_width">10000dp</dimen>
     <dimen name="command_bar_height">64dp</dimen>
     <dimen name="command_bar_padding_start">40dp</dimen>
     <dimen name="command_bar_padding_end">12dp</dimen>

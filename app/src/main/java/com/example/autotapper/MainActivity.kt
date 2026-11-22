@@ -587,12 +587,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * 响应式布局（断点用 Android 官方窗口尺寸：600dp / 840dp，尺寸与字号由资源限定符给出）：
-     *  - 可用宽度 < 840dp → 单列，渲染顺序 = 左栏全部 + 右栏全部，与改造前的单列顺序逐段一致：
-     *      手机档（sw < 600dp）content_max_width = 10000dp，等于不限制宽度，满宽单列；
-     *      平板竖屏档（sw >= 600dp）content_max_width = 640dp，单列加宽并居中。
-     *  - 可用宽度 >= 840dp → 左右两栏并排，各占一半（平板横屏、大屏）：
+     * 响应式布局（断点用 Android 官方窗口宽度：600dp / 840dp，尺寸与字号由 w<N>dp 资源限定符给出）：
+     *  - 可用宽度 < 840dp → 单列，渲染顺序 = 左栏全部 + 右栏全部，与改造前的单列顺序逐段一致；
+     *      手机与平板竖屏都不限内容宽度（content_max_width = 10000dp），留白只由 page_gutter 控制，
+     *      因此平板竖屏是「铺满可用宽度」而不是「中间一条窄卡片」。
+     *  - 可用宽度 >= 840dp（平板横屏、大屏）→ 左右两栏并排，宽度按 45:55 分配：
      *      左栏 = 说明 hero + 权限状态 + 点击方式；右栏 = 点击点位 + 点击配置 + 当前配置 + 使用说明。
+     *      右栏内容更多（列表 + 四组输入 + 看板 + 说明），所以多拿一点横向空间。
      * 只在数值真的发生变化时才改 layoutParams，避免配置变化时无谓地触发 requestLayout。
      */
     private fun applyResponsiveLayout() {
@@ -611,10 +612,9 @@ class MainActivity : AppCompatActivity() {
             contentSplit.orientation = targetOrientation
         }
 
-        // 两栏时左右各占一半（width=0 + weight=1）；单列时回到 match_parent + weight=0
-        val columnWeight = if (twoColumn) 1f else 0f
-        applyColumnParams(contentLeft, columnWeight)
-        applyColumnParams(contentRight, columnWeight)
+        // 两栏时按 45:55 分配（width=0 + weight）；单列时回到 match_parent + weight=0
+        applyColumnParams(contentLeft, if (twoColumn) LEFT_COLUMN_WEIGHT else 0f)
+        applyColumnParams(contentRight, if (twoColumn) RIGHT_COLUMN_WEIGHT else 0f)
 
         // 两栏间距只加在右栏的 paddingStart 上；单列时归零（改造前两栏容器都没有内边距）
         val columnGapPx = if (twoColumn) resources.getDimensionPixelSize(R.dimen.column_gap) else 0
@@ -671,5 +671,9 @@ class MainActivity : AppCompatActivity() {
 
         /** Android 官方窗口宽度断点：>= 840dp 时主界面切成左右两栏。 */
         private const val WINDOW_WIDTH_TWO_COLUMN_DP = 840
+
+        /** 两栏宽度比例：右栏表单与列表更重，给它多一点横向空间。 */
+        private const val LEFT_COLUMN_WEIGHT = 0.45f
+        private const val RIGHT_COLUMN_WEIGHT = 0.55f
     }
 }
