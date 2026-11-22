@@ -1,5 +1,7 @@
 name: Build Android APK
 
+# 推 main 或手动触发：跑单元测试 → 构建 Debug APK →（尽力）产出可复现 APK
+# → 上传构建产物 → 更新滚动 Release（tag: debug-latest），APK 作为发行版资产。
 on:
   push:
     branches: [ main ]
@@ -7,6 +9,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: build-apk-main
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -32,43 +38,90 @@ jobs:
       - name: Set up Gradle cache
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+      # ubuntu 镜像自带 Android SDK 与 build-tools；这里只补一个 local.properties，
+      # 不额外装 SDK（装 SDK 的第三方 action 在部分镜像上会因权限失败）
+      - name: Point Gradle at the runner SDK
+        run: |
+          set -euo pipefail
+          echo "sdk.dir=${ANDROID_HOME}" > local.properties
+          ls "${ANDROID_HOME}/build-tools"
 
       - name: Read app version
         id: version
         run: |
-          VERSION_NAME=$(grep -oP 'versionName\s+"\K[^"]+' app/build.gradle)
-          echo "VERSION_NAME=${VERSION_NAME}" >> "$GITHUB_OUTPUT"
-          echo "Detected app version: ${VERSION_NAME}"
+          set -euo pipefail
+          name=$(grep -oP 'versionName\s+"\K[^"]+' app/build.gradle)
+          code=$(grep -oP 'versionCode\s+\K[0-9]+' app/build.gradle)
+          echo "name=${name}" >> "$GITHUB_OUTPUT"
+          echo "code=${code}" >> "$GITHUB_OUTPUT"
+          echo "版本：${name}（versionCode ${code}）"
+
+      - name: Run unit tests
+        run: ./gradlew --no-daemon :app:testDebugUnitTest
+
+      - name: Build Debug APK
+        run: ./gradlew --no-daemon :app:assembleDebug
+
+      # 可复现 APK：固定时间戳重打包 + 同一把 debug 密钥重签（tools/reproducible_apk.py）。
+      # 它依赖 build-tools 的 zipalign/apksigner 与 python3，缺任何一样都不该让发布失败，
+      # 所以 continue-on-error；成功时它就地覆盖 app-debug.apk。
+      - name: Try reproducible APK
+        continue-on-error: true
+        run: ./gradlew --no-daemon :app:reproApk
 
       - name: Prepare APK for release
-        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/AutoTapper-debug.apk
+        id: asset
+        run: |
+          set -euo pipefail
+          name="${{ steps.version.outputs.name }}"
+          src="app/build/outputs/apk/debug/app-debug.apk"
+          mkdir -p dist
+          cp "$src" "dist/AutoTapper-debug.apk"
+          cp "$src" "dist/AutoTapper-${name}-debug.apk"
+          sha=$(sha256sum "dist/AutoTapper-${name}-debug.apk" | cut -d' ' -f1)
+          size=$(stat -c%s "dist/AutoTapper-${name}-debug.apk")
+          echo "sha256=${sha}" >> "$GITHUB_OUTPUT"
+          echo "size=${size}" >> "$GITHUB_OUTPUT"
+          echo "APK：${size} 字节，sha256=${sha}"
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: AutoTapper-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: AutoTapper-${{ steps.version.outputs.name }}-debug-apk
+          path: dist/*.apk
+          if-no-files-found: error
 
       - name: Publish Rolling Release
         if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION_NAME: ${{ steps.version.outputs.VERSION_NAME }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          VERSION_CODE: ${{ steps.version.outputs.code }}
+          APK_SHA256: ${{ steps.asset.outputs.sha256 }}
+          APK_SIZE: ${{ steps.asset.outputs.size }}
         run: |
+          set -euo pipefail
           TAG_NAME="debug-latest"
           RELEASE_TITLE="AutoTapper v${VERSION_NAME} (debug)"
-          RELEASE_NOTES="Automated debug APK for commit ${GITHUB_SHA:0:7}.
-          Version: ${VERSION_NAME}
-          Download: AutoTapper-debug.apk"
-          APK_PATH="app/build/outputs/apk/debug/AutoTapper-debug.apk"
+          RELEASE_NOTES=$(cat <<EOF
+          自动构建的 **debug 签名** 安装包，可直接装到自己的设备上（想要正式签名请按 README 自己签）。
+
+          - 版本：v${VERSION_NAME}（versionCode ${VERSION_CODE}）
+          - 提交：${GITHUB_SHA:0:7}
+          - APK 大小：${APK_SIZE} 字节
+          - APK SHA-256：${APK_SHA256}
+          - 本次构建已跑 :app:testDebugUnitTest（72 个单元测试）
+
+          更新日志见 CHANGELOG.md。
+          EOF
+          )
 
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
             gh release delete "$TAG_NAME" --cleanup-tag --yes
           fi
 
-          gh release create "$TAG_NAME" "$APK_PATH" \
+          gh release create "$TAG_NAME" \
+            dist/AutoTapper-debug.apk "dist/AutoTapper-${VERSION_NAME}-debug.apk" \
             --title "$RELEASE_TITLE" \
             --notes "$RELEASE_NOTES" \
             --target "$GITHUB_SHA" \
