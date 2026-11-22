@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      平板档（smallest width >= 600dp）：单列，内容最大宽度 640dp，靠 FrameLayout + center_horizontal 居中。
+      只放大留白、控件高度和字号，结构不变（两栏在 w840dp 才发生，见 MainActivity.applyResponsiveLayout）。
+      注意：这里的 content_max_width 只在 sw >= 600dp 生效；手机横屏（sw < 600dp）仍用 values/ 的值。
+    -->
+    <dimen name="page_gutter">32dp</dimen>
+    <dimen name="section_gap">32dp</dimen>
+    <dimen name="block_gap">20dp</dimen>
+    <dimen name="block_padding">20dp</dimen>
+    <dimen name="control_min_height">56dp</dimen>
+    <dimen name="permission_row_min_height">56dp</dimen>
+    <dimen name="list_row_height">60dp</dimen>
+    <dimen name="body_size">16sp</dimen>
+    <dimen name="label_size">14sp</dimen>
+    <dimen name="title_size">34sp</dimen>
+    <dimen name="section_title_size">18sp</dimen>
+    <dimen name="column_gap">0dp</dimen>
+    <dimen name="content_max_width">640dp</dimen>
+    <dimen name="command_bar_height">64dp</dimen>
+    <dimen name="command_bar_padding_start">32dp</dimen>
+    <dimen name="command_bar_padding_end">12dp</dimen>
+</resources>

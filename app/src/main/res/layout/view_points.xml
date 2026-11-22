@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  点击点位（右栏第 1 段）：编号 + 标题徽标 + 点位列表 + 打开悬浮控制器。
+  开头 1px ef_rule 细线只在单列（手机 / 平板竖屏）时作为分区线；两栏时由 MainActivity 置为 GONE，避免右栏顶部多一条线。
+  activity_main.xml 通过 <include> 引入；尺寸走 @dimen，手机档 = 改造前的硬编码值。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/rule_points_top"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/section_gap"
+        android:background="@color/ef_rule" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Text.AutoTapper.Eyebrow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/eyebrow_points" />
+
+            <TextView
+                style="@style/Text.AutoTapper.Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/points_title"
+                android:textSize="@dimen/section_title_size" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_points_count"
+            style="@style/Text.AutoTapper.Tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_points"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:nestedScrollingEnabled="false"
+        android:scrollbars="none" />
+
+    <TextView
+        android:id="@+id/tv_points_empty"
+        style="@style/Text.AutoTapper.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/points_empty"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_open_controller"
+        style="@style/Button.AutoTapper.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/control_min_height"
+        android:layout_marginTop="@dimen/block_gap"
+        android:text="@string/open_controller" />
+</LinearLayout>

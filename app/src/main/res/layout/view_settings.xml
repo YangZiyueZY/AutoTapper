@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  点击配置（右栏第 2 段）：四组数字输入（间隔 / 随机抖动 / 按下时长 / 轮数）+ 悬浮窗透明度。
+  开场 1px ef_rule 细线；组与组之间用 @dimen/block_gap 留白，不再堆细线。
+  activity_main.xml 通过 <include> 引入；尺寸走 @dimen，手机档 = 改造前的硬编码值。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/section_gap"
+        android:background="@color/ef_rule" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Eyebrow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/eyebrow_settings" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/config_title"
+        android:textSize="@dimen/section_title_size" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:lineSpacingExtra="5dp"
+        android:text="@string/config_intro" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/block_gap"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/Text.AutoTapper.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@+id/et_interval_ms"
+            android:text="@string/interval_label"
+            android:textSize="@dimen/label_size" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_interval_ms"
+                style="@style/Input.AutoTapper.Field"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/control_min_height"
+                android:layout_weight="1"
+                android:importantForAutofill="no" />
+
+            <TextView
+                style="@style/Text.AutoTapper.Unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="ms" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/Text.AutoTapper.Help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/interval_help" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/block_gap"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/Text.AutoTapper.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@+id/et_random_extra_ms"
+            android:text="@string/random_extra_label"
+            android:textSize="@dimen/label_size" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_random_extra_ms"
+                style="@style/Input.AutoTapper.Field"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/control_min_height"
+                android:layout_weight="1"
+                android:importantForAutofill="no" />
+
+            <TextView
+                style="@style/Text.AutoTapper.Unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="ms" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/Text.AutoTapper.Help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/random_extra_help" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/block_gap"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/Text.AutoTapper.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@+id/et_tap_duration_ms"
+            android:text="@string/tap_duration_label"
+            android:textSize="@dimen/label_size" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_tap_duration_ms"
+                style="@style/Input.AutoTapper.Field"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/control_min_height"
+                android:layout_weight="1"
+                android:importantForAutofill="no" />
+
+            <TextView
+                style="@style/Text.AutoTapper.Unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="ms" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/Text.AutoTapper.Help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/tap_duration_help" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/block_gap"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/Text.AutoTapper.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@+id/et_repeat_count"
+            android:text="@string/repeat_count_label"
+            android:textSize="@dimen/label_size" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_repeat_count"
+                style="@style/Input.AutoTapper.Field"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/control_min_height"
+                android:layout_weight="1"
+                android:importantForAutofill="no" />
+
+            <TextView
+                style="@style/Text.AutoTapper.Unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="轮" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/Text.AutoTapper.Help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/repeat_count_help" />
+    </LinearLayout>
+
+    <!-- 悬浮窗透明度 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.AutoTapper.Label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/controller_alpha_label"
+                android:textSize="@dimen/label_size" />
+
+            <TextView
+                android:id="@+id/tv_controller_alpha_value"
+                style="@style/Text.AutoTapper.Field"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ef_ink" />
+        </LinearLayout>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider_controller_alpha"
+            style="@style/Slider.AutoTapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:stepSize="0.05"
+            android:value="1.0"
+            android:valueFrom="0.3"
+            android:valueTo="1.0" />
+    </LinearLayout>
+</LinearLayout>

@@ -51,7 +51,7 @@
     <!-- 点位 -->
     <string name="points_title">点击点位</string>
     <string name="points_count_badge">%1$d 个点</string>
-    <string name="points_empty">还没有点位。打开悬浮控制器，用 + 连续添加点击位置。</string>
+    <string name="points_empty">还没有点位。打开悬浮控制器，点「取点」连续添加点击位置。</string>
     <string name="open_controller">打开悬浮控制器取点</string>
     <string name="point_item_index">点 %1$d</string>
     <string name="point_item_coords">(%1$d, %2$d)</string>
@@ -81,14 +81,14 @@
 
     <string name="start_clicking">开始点击</string>
     <string name="stop_clicking">停止点击</string>
-    <string name="usage_note">打开悬浮控制器后侧边会出现可拖动的悬浮球。展开控制器：+ 添加点位、DEL 删除最后一个点位、GO 开始点击、STOP 停止。</string>
+    <string name="usage_note">打开悬浮控制器后，屏幕侧边会出现可拖动的窄条：点「取点」加点位、「删点」删掉最后一个、「开始 / 停止」控制点击、「详情」看参数、「收起」缩成贴边小标签。</string>
 
     <string name="overlay_permission_required">需要先授予悬浮窗权限。</string>
     <string name="overlay_started">悬浮控制器已显示，可在任意应用中使用。</string>
     <string name="overlay_started_pick">悬浮控制器已显示，请点击屏幕添加点位。</string>
     <string name="overlay_closed">悬浮控制器已关闭。</string>
     <string name="accessibility_permission_required">需要先开启 AutoTapper 无障碍服务。</string>
-    <string name="point_required">请先通过悬浮控制器上的 + 添加点击位置。</string>
+    <string name="point_required">请先通过悬浮控制器上的「取点」添加点击位置。</string>
     <string name="invalid_number_input">请输入有效配置：基础间隔至少 100 毫秒，点击时长需在 10 到 2000 毫秒之间，各字段都不能留空。</string>
     <string name="start_command_sent">开始指令已发送。</string>
     <string name="stop_command_sent">停止指令已发送。</string>
@@ -121,7 +121,7 @@
     <string name="finish_capture">完成</string>
     <string name="cancel_capture">取消</string>
 
-    <string name="accessibility_service_description">用于在任意应用中执行自动点击手势。启用后只会在你手动点击“开始点击”或悬浮控制器上的 GO 时工作。</string>
+    <string name="accessibility_service_description">用于在任意应用中执行自动点击手势。启用后只会在你手动点击“开始点击”或悬浮控制器上的「开始」时工作。</string>
     <string name="accessibility_ready">AutoTapper 无障碍服务已连接。</string>
     <string name="click_started">自动点击已启动。</string>
     <string name="click_stopped">自动点击已停止。</string>
@@ -135,35 +135,34 @@
     <string name="overlay_notification_idle">控制器已就绪，可在任意应用中展开使用。</string>
     <string name="overlay_notification_running">自动点击进行中，可展开悬浮控制器停止。</string>
     <string name="overlay_notification_stop">关闭控制器</string>
-    <string name="overlay_collapse_label">收起</string>
-    <string name="overlay_expand_label">展开</string>
-    <string name="overlay_controller_title">悬浮控制器</string>
-    <string name="overlay_add_label">ADD</string>
-    <string name="overlay_clear_label">DEL</string>
-    <string name="overlay_play_label">GO</string>
-    <string name="overlay_stop_label">STOP</string>
-    <string name="overlay_add_button_desc">添加点位</string>
-    <string name="overlay_clear_button_desc">删除点位</string>
     <string name="overlay_play_button_desc">开始点击</string>
     <string name="overlay_stop_button_desc">停止点击</string>
-    <string name="overlay_close_button_desc">关闭悬浮控制器</string>
-    <string name="overlay_close_label">关闭控制器</string>
-    <string name="overlay_handle_idle">AT</string>
-    <string name="overlay_handle_running">RUN</string>
-    <string name="overlay_points_template">%1$d 个：%2$s</string>
-    <string name="overlay_points_more">等 %1$d 个</string>
-    <string name="overlay_point_missing">未设置</string>
+
+    <!-- 悬浮控制台（右侧/左侧贴边竖条） -->
+    <string name="rail_label_start">开始</string>
+    <string name="rail_label_stop">停止</string>
+    <string name="rail_label_pick">取点</string>
+    <string name="rail_label_delete">删点</string>
+    <string name="rail_label_info">详情</string>
+    <string name="rail_label_collapse">收起</string>
+    <string name="rail_label_close">关闭</string>
+    <string name="rail_unit_point">点</string>
+    <string name="rail_readout_title">// READOUT</string>
+    <string name="rail_field_state">状态</string>
+    <string name="rail_field_interval">间隔</string>
+    <string name="rail_field_duration">时长</string>
+    <string name="rail_field_repeat">轮数</string>
+    <string name="rail_desc_expand">展开控制台</string>
+    <string name="rail_desc_pick">取点：连续添加点击位置</string>
+    <string name="rail_desc_delete">删点：删除最后一个点位</string>
+    <string name="rail_desc_info">详情：显示或隐藏读数</string>
+    <string name="rail_desc_collapse">收起控制台</string>
+    <string name="rail_desc_close">关闭悬浮控制器</string>
+
     <string name="overlay_repeat_infinite">无限</string>
     <string name="overlay_repeat_finite">%1$d 轮</string>
     <string name="overlay_state_running">运行中</string>
     <string name="overlay_state_idle">待命</string>
-    <string name="overlay_field_state">状态</string>
-    <string name="overlay_field_interval">间隔</string>
-    <string name="overlay_field_duration">时长</string>
-    <string name="overlay_field_repeat">轮数</string>
-    <string name="overlay_field_points">点位</string>
     <string name="overlay_interval_value">%1$d–%2$d ms</string>
     <string name="overlay_duration_value">%1$d ms</string>
-    <string name="overlay_points_value">%1$d 个</string>
-    <string name="overlay_status_template">%1$s · 间隔 %2$d-%3$d ms · 时长 %4$d ms · 轮数：%5$s</string>
 </resources>

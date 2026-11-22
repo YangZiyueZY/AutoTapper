@@ -36,4 +36,25 @@
     <dimen name="tag_padding_h">8dp</dimen>
     <dimen name="tag_padding_v">3dp</dimen>
     <dimen name="page_padding_h">16dp</dimen>
+
+    <!--
+      响应式布局（手机档）。这些值必须等于改造前 activity_main.xml 里的硬编码值，
+      sw < 600dp 的手机才会与改造前逐像素一致；平板/大屏的覆盖值在 values-sw600dp 与 values-w840dp。
+      dimen 只能表达尺寸（dp/sp）：match_parent、权重、是否两栏由 MainActivity.applyResponsiveLayout() 处理。
+    -->
+    <dimen name="page_gutter">16dp</dimen>
+    <dimen name="section_gap">24dp</dimen>
+    <dimen name="block_gap">16dp</dimen>
+    <dimen name="block_padding">16dp</dimen>
+    <dimen name="control_min_height">48dp</dimen>
+    <dimen name="permission_row_min_height">52dp</dimen>
+    <dimen name="list_row_height">52dp</dimen>
+    <dimen name="body_size">15sp</dimen>
+    <dimen name="label_size">13sp</dimen>
+    <dimen name="title_size">30sp</dimen>
+    <dimen name="section_title_size">17sp</dimen>
+    <dimen name="column_gap">0dp</dimen>
+    <dimen name="content_max_width">10000dp</dimen>
+    <dimen name="command_bar_padding_start">16dp</dimen>
+    <dimen name="command_bar_padding_end">8dp</dimen>
 </resources>

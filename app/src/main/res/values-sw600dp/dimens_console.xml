@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 平板档（smallest width >= 600dp）：控制器整体放大约 1.15x，窄条与读数板同步变宽，比例不变。 -->
+    <dimen name="console_rail_width">54dp</dimen>
+    <dimen name="console_tab_width">46dp</dimen>
+    <dimen name="console_tab_height">62dp</dimen>
+    <dimen name="console_info_width">116dp</dimen>
+    <dimen name="console_header_height">60dp</dimen>
+    <dimen name="console_cell_height">48dp</dimen>
+    <dimen name="console_margin">10dp</dimen>
+    <dimen name="console_marker_size">28dp</dimen>
+</resources>

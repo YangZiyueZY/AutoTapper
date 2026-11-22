@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="250" viewBox="0 0 1200 250"
      role="img" aria-labelledby="wfTitle wfDesc">
   <title id="wfTitle">AutoTapper 的使用流程：取点、配置、开始、轮询点击</title>
-  <desc id="wfDesc">四个步骤横向排列：01 取点记录位置，02 配置间隔与轮数，03 按 GO 开始，04 按点位顺序循环点击；一条虚线从第四步回到第一步表示循环。</desc>
+  <desc id="wfDesc">四个步骤横向排列：01 取点记录位置，02 配置间隔与轮数，03 按「开始」运行，04 按点位顺序循环点击；一条虚线从第四步回到第一步表示循环。</desc>
 
   <defs>
     <style>
@@ -30,7 +30,7 @@
     <path d="M0 0 H246 V118 L228 136 H0 Z" fill="#222222" stroke="#353535" stroke-width="1.4" />
     <text class="mono" x="20" y="40" font-size="26" font-weight="700" fill="#FFFA00">03</text>
     <text class="ui" x="20" y="80" font-size="22" font-weight="700" fill="#F4F4F2">开始</text>
-    <text class="ui" x="20" y="110" font-size="17" fill="#A3A3A3">按 GO 或主界面按钮</text>
+    <text class="ui" x="20" y="110" font-size="17" fill="#A3A3A3">按「开始」或主界面按钮</text>
   </g>
 
   <g transform="translate(878 30)">

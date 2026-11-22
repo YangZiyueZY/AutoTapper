@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  使用说明（右栏第 4 段）：白底细框 + 左侧强调色竖条。
+  开场 1px ef_rule 细线；这是全页最后一段。
+  activity_main.xml 通过 <include> 引入；尺寸走 @dimen，手机档 = 改造前的硬编码值。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/section_gap"
+        android:background="@color/ef_rule" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Eyebrow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/eyebrow_note" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/ef_note_panel"
+        android:lineSpacingExtra="5dp"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="14dp"
+        android:text="@string/usage_note" />
+</LinearLayout>

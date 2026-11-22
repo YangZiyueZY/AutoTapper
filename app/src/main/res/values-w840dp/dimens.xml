@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      大屏档（available width >= 840dp：平板横屏、桌面/大屏）：左右两栏并排，两栏间距 column_gap=40dp。
+      这份文件里 column_gap 大于 0，MainActivity 据此给右栏加 paddingStart；其余值只放大留白与字号。
+    -->
+    <dimen name="page_gutter">40dp</dimen>
+    <dimen name="section_gap">40dp</dimen>
+    <dimen name="block_gap">24dp</dimen>
+    <dimen name="block_padding">24dp</dimen>
+    <dimen name="control_min_height">56dp</dimen>
+    <dimen name="permission_row_min_height">56dp</dimen>
+    <dimen name="list_row_height">64dp</dimen>
+    <dimen name="body_size">16sp</dimen>
+    <dimen name="label_size">14sp</dimen>
+    <dimen name="title_size">34sp</dimen>
+    <dimen name="section_title_size">18sp</dimen>
+    <dimen name="column_gap">40dp</dimen>
+    <dimen name="content_max_width">1120dp</dimen>
+    <dimen name="command_bar_height">64dp</dimen>
+    <dimen name="command_bar_padding_start">40dp</dimen>
+    <dimen name="command_bar_padding_end">12dp</dimen>
+</resources>

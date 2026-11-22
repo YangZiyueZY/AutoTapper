@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  当前配置摘要（右栏第 3 段）：一块看板（白板 + 1px 墨线 + 顶部墨色页签）。
+  这一段不带开场细线：上面用 @dimen/section_gap 留白 + 眉标分隔（改造前就是这样）。
+  activity_main.xml 通过 <include> 引入；尺寸走 @dimen，手机档 = 改造前的硬编码值。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/Text.AutoTapper.Eyebrow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/section_gap"
+        android:text="@string/eyebrow_summary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/ef_panel_board"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="@dimen/board_tab_width"
+            android:layout_height="@dimen/board_tab_height"
+            android:background="@color/ef_ink" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/block_padding">
+
+            <TextView
+                style="@style/Text.AutoTapper.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/config_summary_title"
+                android:textSize="@dimen/label_size" />
+
+            <TextView
+                android:id="@+id/tv_config_summary"
+                style="@style/Text.AutoTapper.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="6dp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

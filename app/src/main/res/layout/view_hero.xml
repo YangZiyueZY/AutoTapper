@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  首屏（左栏第 1 段）：中文大标题 + 一句说明 + 一行字段（宽体小字，代码填文案）。
+  这一段不带尾部细线：紧接其后的 view_permissions 以细线开场。
+  activity_main.xml 通过 <include> 引入；尺寸走 @dimen，手机档 = 改造前的硬编码值。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/Text.AutoTapper.Display"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/screen_title"
+        android:textSize="@dimen/title_size" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:lineSpacingExtra="5dp"
+        android:text="@string/screen_subtitle"
+        android:textSize="@dimen/body_size" />
+
+    <TextView
+        android:id="@+id/tv_hero_fields"
+        style="@style/Text.AutoTapper.Field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp" />
+</LinearLayout>

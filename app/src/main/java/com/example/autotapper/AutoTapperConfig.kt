@@ -14,6 +14,7 @@ object AutoTapperConfig {
     const val KEY_TAP_DURATION_MS = "tap_duration_ms"
     const val KEY_CONTROLLER_ALPHA = "controller_alpha"
     const val KEY_TAP_MODE = "tap_mode"
+    const val KEY_CONSOLE_DOCK_RIGHT = "console_dock_right"
 
     // 点击配置的默认值与取值范围
     const val DEFAULT_INTERVAL_MS = 100L
@@ -55,6 +56,13 @@ object AutoTapperConfig {
 
     fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    fun getConsoleDockedRight(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_CONSOLE_DOCK_RIGHT, true)
+
+    fun saveConsoleDock(context: Context, dockedRight: Boolean) {
+        prefs(context).edit().putBoolean(KEY_CONSOLE_DOCK_RIGHT, dockedRight).apply()
+    }
 
     fun getTapMode(context: Context): String =
         prefs(context).getString(KEY_TAP_MODE, TAP_MODE_ACCESSIBILITY)

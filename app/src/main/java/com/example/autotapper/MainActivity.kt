@@ -8,7 +8,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -83,6 +85,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // 断点在资源里（sw600dp / w840dp）已经决定了尺寸与字号，结构切换（单列 / 两栏）在代码里做。
+        // 这里不声明 android:configChanges：旋转 / 分屏改窗口时系统会重建 Activity，onCreate 会再走一遍，
+        // 比“自己重写 onConfigurationChanged”少一份需要维护的状态（也更不用碰 manifest）。
+        applyResponsiveLayout()
 
         tvVersion = findViewById(R.id.tv_version)
         tvHeroFields = findViewById(R.id.tv_hero_fields)
@@ -356,6 +363,10 @@ class MainActivity : AppCompatActivity() {
             return
         }
         AutoTapperConfig.removePointAt(this, index)
+        // 通知悬浮控制器同步点位数与徽标（控制器删点也会发这条广播）
+        sendBroadcast(
+            Intent(AutoTapperConfig.ACTION_POINT_SELECTED).setPackage(packageName)
+        )
         points = AutoTapperConfig.loadPoints(this)
         pointsAdapter.removeItem(index)
         tvPointsEmpty.visibility = if (points.isEmpty()) View.VISIBLE else View.GONE
@@ -575,7 +586,90 @@ class MainActivity : AppCompatActivity() {
         pointReceiverRegistered = false
     }
 
+    /**
+     * 响应式布局（断点用 Android 官方窗口尺寸：600dp / 840dp，尺寸与字号由资源限定符给出）：
+     *  - 可用宽度 < 840dp → 单列，渲染顺序 = 左栏全部 + 右栏全部，与改造前的单列顺序逐段一致：
+     *      手机档（sw < 600dp）content_max_width = 10000dp，等于不限制宽度，满宽单列；
+     *      平板竖屏档（sw >= 600dp）content_max_width = 640dp，单列加宽并居中。
+     *  - 可用宽度 >= 840dp → 左右两栏并排，各占一半（平板横屏、大屏）：
+     *      左栏 = 说明 hero + 权限状态 + 点击方式；右栏 = 点击点位 + 点击配置 + 当前配置 + 使用说明。
+     * 只在数值真的发生变化时才改 layoutParams，避免配置变化时无谓地触发 requestLayout。
+     */
+    private fun applyResponsiveLayout() {
+        val contentRoot = findViewById<LinearLayout>(R.id.content_root) ?: return
+        val contentSplit = findViewById<LinearLayout>(R.id.content_split) ?: return
+        val contentLeft = findViewById<LinearLayout>(R.id.content_left) ?: return
+        val contentRight = findViewById<LinearLayout>(R.id.content_right) ?: return
+        val pointsTopRule = findViewById<View>(R.id.rule_points_top)
+
+        val widthDp = resources.configuration.screenWidthDp
+        val twoColumn = widthDp >= WINDOW_WIDTH_TWO_COLUMN_DP
+
+        val targetOrientation =
+            if (twoColumn) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
+        if (contentSplit.orientation != targetOrientation) {
+            contentSplit.orientation = targetOrientation
+        }
+
+        // 两栏时左右各占一半（width=0 + weight=1）；单列时回到 match_parent + weight=0
+        val columnWeight = if (twoColumn) 1f else 0f
+        applyColumnParams(contentLeft, columnWeight)
+        applyColumnParams(contentRight, columnWeight)
+
+        // 两栏间距只加在右栏的 paddingStart 上；单列时归零（改造前两栏容器都没有内边距）
+        val columnGapPx = if (twoColumn) resources.getDimensionPixelSize(R.dimen.column_gap) else 0
+        if (contentRight.paddingStart != columnGapPx) {
+            contentRight.setPaddingRelative(
+                columnGapPx,
+                contentRight.paddingTop,
+                contentRight.paddingEnd,
+                contentRight.paddingBottom
+            )
+        }
+
+        // 右栏第一段的 1px 细线：单列时它是“点击方式 / 点击点位”之间的分区线，必须保留；
+        // 两栏时它成了右栏第一个元素（会把右栏整体压低一个 section_gap），置 GONE。
+        if (pointsTopRule != null) {
+            val ruleVisibility = if (twoColumn) View.GONE else View.VISIBLE
+            if (pointsTopRule.visibility != ruleVisibility) {
+                pointsTopRule.visibility = ruleVisibility
+            }
+        }
+
+        // 内容最大宽度：可用宽 = 窗口宽 - 左右留白；上限比可用宽更窄时才收窄，否则保持 match_parent
+        val gutterPx = resources.getDimensionPixelSize(R.dimen.page_gutter)
+        val contentMaxPx = resources.getDimensionPixelSize(R.dimen.content_max_width)
+        val density = resources.displayMetrics.density
+        val availablePx = (widthDp * density).toInt() - 2 * gutterPx
+        val targetRootWidth = if (contentMaxPx in 1 until availablePx) {
+            contentMaxPx
+        } else {
+            ViewGroup.LayoutParams.MATCH_PARENT
+        }
+        val rootParams = contentRoot.layoutParams
+        if (rootParams.width != targetRootWidth) {
+            rootParams.width = targetRootWidth
+            contentRoot.layoutParams = rootParams
+        }
+    }
+
+    /** 两栏 / 单列的列参数；weight > 0 表示两栏并排（width=0 + weight），否则单列满宽。 */
+    private fun applyColumnParams(column: LinearLayout, weight: Float) {
+        val params = column.layoutParams as LinearLayout.LayoutParams
+        val targetWidth =
+            if (weight > 0f) 0 else LinearLayout.LayoutParams.MATCH_PARENT
+        if (params.width == targetWidth && params.weight == weight) {
+            return
+        }
+        params.width = targetWidth
+        params.weight = weight
+        column.layoutParams = params
+    }
+
     companion object {
         private const val REQUEST_CODE_SHIZUKU = 4001
+
+        /** Android 官方窗口宽度断点：>= 840dp 时主界面切成左右两栏。 */
+        private const val WINDOW_WIDTH_TWO_COLUMN_DP = 840
     }
 }

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  点击方式（左栏第 3 段）：分段选择，当前段墨底反白（不用黄）。
+  开场 1px ef_rule 细线；这一段不带尾部细线（两栏时它就是左栏结尾，避免悬空细线）。
+  activity_main.xml 通过 <include> 引入；尺寸走 @dimen，手机档 = 改造前的硬编码值。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/section_gap"
+        android:background="@color/ef_rule" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Eyebrow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/eyebrow_tap_mode" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/tap_mode_title"
+        android:textSize="@dimen/section_title_size" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:lineSpacingExtra="5dp"
+        android:text="@string/tap_mode_intro" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_mode_auto"
+            style="@style/Button.AutoTapper.Segment"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/control_min_height"
+            android:layout_weight="1"
+            android:text="@string/tap_mode_auto" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_mode_shizuku"
+            style="@style/Button.AutoTapper.Segment"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/control_min_height"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/tap_mode_shizuku" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_tap_mode_hint"
+        style="@style/Text.AutoTapper.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+</LinearLayout>

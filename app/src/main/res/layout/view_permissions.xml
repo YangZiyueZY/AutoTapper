@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  权限状态（左栏第 2 段）：开场 1px ef_rule 细线（分区间隔），三行权限记录，行间细线。
+  细线只在这一段开头出现一次，避免与上一段拼接时出现双线。
+  activity_main.xml 通过 <include> 引入；尺寸走 @dimen，手机档 = 改造前的硬编码值。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/section_gap"
+        android:background="@color/ef_rule" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Eyebrow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/eyebrow_permissions" />
+
+    <TextView
+        style="@style/Text.AutoTapper.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/status_title"
+        android:textSize="@dimen/section_title_size" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/permission_row_min_height"
+                android:orientation="horizontal"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp">
+
+                <TextView
+                    style="@style/Text.AutoTapper.Tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No.01" />
+                <!-- 兼容旧 id：老代码会在这个小方块上设置背景，尺寸为 0，不占位也不显示 -->
+                <View
+                    android:id="@+id/dot_overlay"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp" />
+
+                <!-- 名称在上、状态块在下：状态文案由代码设置，可能比行内空间宽，竖排更稳 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="悬浮窗权限"
+                        android:textColor="@color/ef_ink"
+                        android:textSize="@dimen/body_size" />
+
+                    <TextView
+                        android:id="@+id/tv_overlay_state"
+                        style="@style/Text.AutoTapper.StateBlock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_grant_overlay"
+                    style="@style/Button.AutoTapper.Ghost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/control_min_height"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/grant_permission_button" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ef_rule" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/permission_row_min_height"
+                android:orientation="horizontal"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp">
+
+                <TextView
+                    style="@style/Text.AutoTapper.Tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No.02" />
+                <!-- 兼容旧 id：老代码会在这个小方块上设置背景，尺寸为 0，不占位也不显示 -->
+                <View
+                    android:id="@+id/dot_accessibility"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp" />
+
+                <!-- 名称在上、状态块在下：状态文案由代码设置，可能比行内空间宽，竖排更稳 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="无障碍服务"
+                        android:textColor="@color/ef_ink"
+                        android:textSize="@dimen/body_size" />
+
+                    <TextView
+                        android:id="@+id/tv_accessibility_state"
+                        style="@style/Text.AutoTapper.StateBlock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_grant_accessibility"
+                    style="@style/Button.AutoTapper.Ghost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/control_min_height"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/grant_permission_button" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ef_rule" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/permission_row_min_height"
+                android:orientation="horizontal"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp">
+
+                <TextView
+                    style="@style/Text.AutoTapper.Tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No.03" />
+
+                <!-- 名称在上、状态块在下：状态文案由代码设置，可能比行内空间宽，竖排更稳 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Shizuku"
+                        android:textColor="@color/ef_ink"
+                        android:textSize="@dimen/body_size" />
+
+                    <TextView
+                        android:id="@+id/tv_shizuku_state"
+                        style="@style/Text.AutoTapper.StateBlock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_grant_shizuku"
+                    style="@style/Button.AutoTapper.Ghost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/control_min_height"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/grant_permission_button" />
+            </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

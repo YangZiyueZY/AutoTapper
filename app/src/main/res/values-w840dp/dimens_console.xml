@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 大屏 / 横屏档（可用宽度 >= 840dp）：在平板档基础上再放大一点，窄条与读数板依旧同比例。 -->
+    <dimen name="console_rail_width">58dp</dimen>
+    <dimen name="console_tab_width">50dp</dimen>
+    <dimen name="console_tab_height">66dp</dimen>
+    <dimen name="console_info_width">124dp</dimen>
+    <dimen name="console_header_height">64dp</dimen>
+    <dimen name="console_cell_height">52dp</dimen>
+    <dimen name="console_margin">12dp</dimen>
+    <dimen name="console_marker_size">30dp</dimen>
+</resources>

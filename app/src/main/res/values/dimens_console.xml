@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      悬浮控制器（侧边窄条 / 收起标签 / 读数板 / 点位徽标）的尺寸。
+      手机档就是原先写死在 ConsoleRail.kt、OverlayService.kt 里的那组数值，必须保持一致；
+      平板与大屏只在 values-sw600dp / values-w840dp 里整体放大，比例和观感不变。
+    -->
+    <dimen name="console_rail_width">46dp</dimen>
+    <dimen name="console_tab_width">40dp</dimen>
+    <dimen name="console_tab_height">54dp</dimen>
+    <dimen name="console_info_width">96dp</dimen>
+    <dimen name="console_header_height">54dp</dimen>
+    <dimen name="console_cell_height">42dp</dimen>
+    <dimen name="console_margin">6dp</dimen>
+    <dimen name="console_marker_size">24dp</dimen>
+</resources>
